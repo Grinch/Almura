@@ -221,8 +221,8 @@ public class UIPlayerListPanel extends AbstractPanel {
                 renderer.drawText(UIPlayerListPanel.getTrimmedDisplayName(this.player2), x + ICON_SIZE + 2, y, this.zIndex);
 
                 // Separator
-                renderer.drawRectangle(this.maxColumnWidth + 5 + this.getLeftPadding(), 1, this.zIndex, 1, this.height - 2,
-                        BORDER_COLOR, 75);
+                renderer.drawRectangle(this.maxColumnWidth + 5 + getLeftPadding(), 1, this.zIndex, 1,
+                        this.height - 2, BORDER_COLOR, 75);
             }
         }
     }

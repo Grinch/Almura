@@ -7,10 +7,18 @@
  */
 package com.almuradev.almura.feature.menu.game;
 
+<<<<<<< HEAD
 import com.almuradev.almura.shared.client.GuiConfig;
 import com.almuradev.almura.shared.client.ui.FontColors;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
+=======
+import com.almuradev.almura.feature.menu.guide.SimplePageCreate;
+import com.almuradev.shared.client.GuiConfig;
+import com.almuradev.shared.client.ui.FontColors;
+import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.shared.client.ui.screen.SimpleScreen;
+>>>>>>> Add guide/SimplePageCreate
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
 import net.malisis.core.client.gui.GuiTexture;
@@ -91,8 +99,13 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 .position(SimpleScreen.getPaddedX(shopButton, PADDING), shopButton.getY())
                 .anchor(Anchor.MIDDLE | Anchor.LEFT)
                 .listener(this)
+<<<<<<< HEAD
                 .tooltip(Text.of(I18n.format("almura.menu_button.guide")))
                 .enabled(guideAvailable)
+=======
+                .tooltip(Text.of(I18n.format("almura.menu.guide")))
+//                .enabled(guideAvailable)
+>>>>>>> Add guide/SimplePageCreate
                 .build("button.guide");
 
         final UIButton mapButton = new UIButtonBuilder(this)
@@ -183,7 +196,7 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 break;
             case "button.guide":
                 if (this.mc.player != null) {
-                    this.close();
+                    new SimplePageCreate().display();
                 }
                 break;
             case "button.instance":
