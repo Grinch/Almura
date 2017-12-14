@@ -23,8 +23,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class SimplePageCreate extends SimpleScreen {
-    private static final int PADDING = 4;
 
+    private static final int PADDING = 4;
     private UITextField textFieldFileName, textFieldIndex, textFieldTitle;
 
     @Override
@@ -67,12 +67,12 @@ public class SimplePageCreate extends SimpleScreen {
         this.textFieldTitle.setAnchor(Anchor.TOP | Anchor.LEFT);
         this.textFieldTitle.setPosition(0, SimpleScreen.getPaddedY(labelTitle, 1));
         this.textFieldTitle.setSize(UIComponent.INHERITED, 0);
+        this.textFieldTitle.setValidator(new Predicates.StringLengthPredicate(1, 100));
 
         // Save/Cancel
         final UIButton buttonSave = new UIButtonBuilder(this)
                 .text(I18n.format("almura.save"))
                 .anchor(Anchor.BOTTOM | Anchor.RIGHT)
-
                 .size(40, 20)
                 .listener(this)
                 .build("guide.create.save");

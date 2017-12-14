@@ -8,12 +8,16 @@
 package com.almuradev.almura.feature.menu.game;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.almuradev.almura.shared.client.GuiConfig;
 import com.almuradev.almura.shared.client.ui.FontColors;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
 =======
 import com.almuradev.almura.feature.menu.guide.SimplePageCreate;
+=======
+import com.almuradev.almura.feature.menu.guide.SimplePageView;
+>>>>>>> Current progress on Guide reintegration
 import com.almuradev.shared.client.GuiConfig;
 import com.almuradev.shared.client.ui.FontColors;
 import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
@@ -104,8 +108,11 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 .enabled(guideAvailable)
 =======
                 .tooltip(Text.of(I18n.format("almura.menu.guide")))
+<<<<<<< HEAD
 //                .enabled(guideAvailable)
 >>>>>>> Add guide/SimplePageCreate
+=======
+>>>>>>> Current progress on Guide reintegration
                 .build("button.guide");
 
         final UIButton mapButton = new UIButtonBuilder(this)
@@ -196,7 +203,7 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 break;
             case "button.guide":
                 if (this.mc.player != null) {
-                    new SimplePageCreate().display();
+                    new SimplePageView().display();
                 }
                 break;
             case "button.instance":
