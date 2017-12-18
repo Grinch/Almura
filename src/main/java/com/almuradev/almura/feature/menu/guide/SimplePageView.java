@@ -31,6 +31,7 @@ public class SimplePageView extends SimpleScreen {
     private boolean showRaw = false;
     private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
     private UISelect<Page> pagesSelect;
+    private UITextField contentField;
 
     @Override
     public void construct() {
@@ -91,7 +92,7 @@ public class SimplePageView extends SimpleScreen {
                 .build("button.format");
 
         // Content text field
-        final UITextField contentField = new UITextField(this, "", true);
+        contentField = new UITextField(this, "", true);
         contentField.setSize(SimpleScreen.getPaddedWidth(form),
                 SimpleScreen.getPaddedHeight(form) - this.pagesSelect.getHeight() - (INNER_PADDING * 2) - this.buttonFormat.getHeight());
         contentField.setPosition(0, SimpleScreen.getPaddedY(this.pagesSelect, INNER_PADDING));
@@ -154,12 +155,16 @@ public class SimplePageView extends SimpleScreen {
     @Subscribe
     public void onUIButtonClickEvent(UIButton.ClickEvent event) {
         switch (event.getComponent().getName().toLowerCase()) {
+            case "button.details":
+
             case "button.format":
                 this.showRaw = !this.showRaw;
                 this.updateButtons();
+                this.contentField.setText(PageUtil.replaceColorCodes("&", pagesSelect.getSelectedValue().getContents(), this.showRaw));
+
                 break;
             case "button.add":
-                new SimplePageCreate().display();
+                new SimplePageCreate(this).display();
                 break;
             case "button.close":
                 close();

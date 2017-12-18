@@ -9,6 +9,8 @@ package com.almuradev.almura.feature.menu.guide;
 
 import com.almuradev.shared.client.ui.component.UIForm;
 import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.shared.client.ui.component.dialog.MessageBoxButtons;
+import com.almuradev.shared.client.ui.component.dialog.UIMessageBox;
 import com.almuradev.shared.client.ui.screen.SimpleScreen;
 import com.almuradev.shared.util.Predicates;
 import com.google.common.eventbus.Subscribe;
@@ -17,15 +19,22 @@ import net.malisis.core.client.gui.component.UIComponent;
 import net.malisis.core.client.gui.component.decoration.UILabel;
 import net.malisis.core.client.gui.component.interaction.UIButton;
 import net.malisis.core.client.gui.component.interaction.UITextField;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
 public class SimplePageCreate extends SimpleScreen {
 
     private static final int PADDING = 4;
     private UITextField textFieldFileName, textFieldIndex, textFieldTitle;
+
+    public SimplePageCreate(@Nullable GuiScreen parent) {
+        super(parent);
+    }
 
     @Override
     public void construct() {
@@ -105,7 +114,12 @@ public class SimplePageCreate extends SimpleScreen {
                 if (textFieldFileName.getText().isEmpty() || textFieldIndex.getText().isEmpty() || textFieldTitle.getText().isEmpty()) {
                     break;
                 }
-                // TODO: Page registry
+                if (!PageRegistry.getPage(textFieldFileName.getText()).isPresent()) {
+                    UIMessageBox.showDialog(this, "Page already exists!", "The filename is already in use by another page. Please check the "
+                                    + "filename and try again.", MessageBoxButtons.OK);
+                    break;
+                }
+
                 // TODO: Packet to server
                 close();
                 break;
