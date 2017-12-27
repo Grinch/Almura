@@ -38,13 +38,13 @@ public final class ServerboundPageOpenRequestPacketHandler implements MessageHan
     public void handleMessage(ServerboundPageOpenRequestPacket message, RemoteConnection connection, Platform.Type side) {
         if (side.isServer() && connection instanceof PlayerConnection) {
             final Player player = ((PlayerConnection) connection).getPlayer();
+            final Page page = this.manager.getPage(message.id).orElse(null);
 
-            if (!player.hasPermission("almura.guide.page." + "s")) {
-                // We do not have permission for a page we requested to open which means a de-sync. Re-send all page names
-                final Map<String, Page> pagesToSend = this.manager.getAvailablePagesFor(player);
-                this.network.sendTo(player, new ClientboundPageListingsPacket(pagesToSend.keySet()));
+            if (!player.hasPermission("almura.guide.page." + message.id) || page == null) {
+                // We do not have permission for a page or it is null then we have a de-sync. Re-send all page names
+                this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).keySet()));
             } else {
-                this.network.sendTo(player, new ClientboundPageOpenResponsePacket());
+                this.network.sendTo(player, new ClientboundPageOpenResponsePacket(page));
             }
         }
     }

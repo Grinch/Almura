@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -70,6 +71,8 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
 
     @Listener
     public void onGameStartingServer(GameStartingServerEvent event) throws IOException {
+        this.pages.clear();
+        
         if (Files.notExists(this.configRoot)) {
             Files.createDirectories(this.configRoot);
         }
@@ -173,6 +176,10 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
                 {
                     throw new IllegalStateException(String.format("Duplicate key %s", k));
                 }, LinkedHashMap::new));
+    }
+
+    public Optional<Page> getPage(String id) {
+        return Optional.ofNullable(this.pages.get(id));
     }
 
     private static final class PageWalker implements FileVisitor<Path> {

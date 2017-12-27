@@ -31,8 +31,8 @@ public final class ServerboundGuideOpenRequestPacketHandler implements MessageHa
     private final ServerPageManager manager;
 
     @Inject
-    public ServerboundGuideOpenRequestPacketHandler(@ChannelId(NetworkConfig.CHANNEL)ChannelBinding.IndexedMessageChannel network,
-            ServerPageManager manager) {
+    public ServerboundGuideOpenRequestPacketHandler(final @ChannelId(NetworkConfig.CHANNEL)ChannelBinding.IndexedMessageChannel network,
+            final ServerPageManager manager) {
         this.network = network;
         this.manager = manager;
     }

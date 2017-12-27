@@ -21,7 +21,7 @@ public final class ClientboundPageOpenResponsePacketHandler implements MessageHa
     private final ClientPageManager manager;
 
     @Inject
-    public ClientboundPageOpenResponsePacketHandler(ClientPageManager manager) {
+    public ClientboundPageOpenResponsePacketHandler(final ClientPageManager manager) {
         this.manager = manager;
     }
 
