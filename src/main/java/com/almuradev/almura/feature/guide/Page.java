@@ -9,25 +9,34 @@ package com.almuradev.almura.feature.guide;
 
 import com.google.common.base.MoreObjects;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.UUID;
 
 public final class Page {
 
-    private final String identifier;
-    private Date created, lastModified;
-    private String name, author, lastContributor, contents;
+    private final String id;
+    private final Instant created;
+    private final UUID creator;
+
+    private Instant lastModified;
+    private UUID lastModifier;
+    private String name, title, content;
     private int index;
 
-    public Page(String identifier, int index, String name, Date created, String author, Date lastModified, String lastContributor, String contents) {
-        this.identifier = identifier;
-        this.index = index;
-        this.name = name;
+    public Page(String id, UUID creator) {
+        this(id, creator, Instant.now());
+    }
+
+    public Page(String id, UUID creator, Instant created) {
+        this.id = id;
+        this.creator = creator;
         this.created = created;
-        this.author = author;
-        this.lastModified = lastModified;
-        this.lastContributor = lastContributor;
-        this.contents = contents;
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     public int getIndex() {
@@ -39,93 +48,81 @@ public final class Page {
         return this;
     }
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public Page setCreated(Date created) {
-        this.created = created;
-        return this;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public Page setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-        return this;
-    }
-
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public Page setTitle(String name) {
+    public Page setName(String name) {
         this.name = name;
         return this;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getTitle() {
+        return this.title;
     }
 
-    public Page setAuthor(String author) {
-        this.author = author;
+    public Page setTitle(String title) {
+        this.title = title;
         return this;
     }
 
-    public String getLastContributor() {
-        return lastContributor;
+    public UUID getCreator() {
+        return this.creator;
     }
 
-    public Page setLastContributor(String lastContributor) {
-        this.lastContributor = lastContributor;
+    public Instant getCreated() {
+        return this.created;
+    }
+
+    public UUID getLastModifier() {
+        return this.lastModifier;
+    }
+
+    public Page setLastModifier(UUID lastModifier) {
+        this.lastModifier = lastModifier;
         return this;
     }
 
-    public String getContents() {
-        return contents;
+    public Instant getLastModified() {
+        return this.lastModified;
     }
 
-    public Page setContents(String contents) {
-        this.contents = contents;
+    public Page setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+    public String getContent() {
+        return this.content;
+    }
+
+    public Page setContent(String content) {
+        this.content = content;
         return this;
     }
 
     @Override
     public boolean equals(Object o) {
-        return this == o || !(o == null || getClass() != o.getClass()) && identifier.equals(((Page) o).identifier);
+        return this == o || !(o == null || getClass() != o.getClass()) && this.id.equals(((Page) o).id);
     }
 
     @Override
     public int hashCode() {
-        return identifier.hashCode();
+        return this.id.hashCode();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("identifier", this.identifier)
+                .add("id", this.id)
                 .add("index", this.index)
-                .add("created", this.created)
-                .add("lastModified", this.lastModified)
                 .add("name", this.name)
-                .add("author", this.author)
-                .add("lastContributor", this.lastContributor)
-                .add("contents", this.contents)
+                .add("title", this.title)
+                .add("creator", this.creator)
+                .add("created", this.created)
+                .add("lastModifier", this.lastModifier)
+                .add("lastModified", this.lastModified)
+                .add("content", this.content)
                 .toString();
-    }
-
-    public static class PageIndexComparator implements Comparator<Page> {
-
-        @Override
-        public int compare(Page o1, Page o2) {
-            return Integer.compare(o1.index, o2.index);
-        }
     }
 }

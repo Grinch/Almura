@@ -7,26 +7,12 @@
  */
 package com.almuradev.almura.feature.menu.game;
 
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-<<<<<<< HEAD
+import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacket;
 import com.almuradev.almura.shared.client.GuiConfig;
 import com.almuradev.almura.shared.client.ui.FontColors;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
-=======
-import com.almuradev.almura.feature.menu.guide.SimplePageCreate;
-=======
-import com.almuradev.almura.feature.menu.guide.SimplePageView;
->>>>>>> Current progress on Guide reintegration
-=======
-import com.almuradev.almura.feature.guide.client.gui.SimplePageView;
->>>>>>> Stashed changes
-import com.almuradev.shared.client.GuiConfig;
-import com.almuradev.shared.client.ui.FontColors;
-import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
-import com.almuradev.shared.client.ui.screen.SimpleScreen;
->>>>>>> Add guide/SimplePageCreate
+import com.almuradev.almura.shared.network.NetworkConfig;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
 import net.malisis.core.client.gui.GuiTexture;
@@ -43,6 +29,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.network.ChannelId;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
 
@@ -53,8 +41,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 @SideOnly(Side.CLIENT)
 public final class SimpleIngameMenu extends SimpleScreen {
+
+    @Inject
+    private static @ChannelId(NetworkConfig.CHANNEL) ChannelBinding.IndexedMessageChannel network;
 
     private static final int PADDING = 4;
 
@@ -107,16 +100,8 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 .position(SimpleScreen.getPaddedX(shopButton, PADDING), shopButton.getY())
                 .anchor(Anchor.MIDDLE | Anchor.LEFT)
                 .listener(this)
-<<<<<<< HEAD
                 .tooltip(Text.of(I18n.format("almura.menu_button.guide")))
                 .enabled(guideAvailable)
-=======
-                .tooltip(Text.of(I18n.format("almura.menu.guide")))
-<<<<<<< HEAD
-//                .enabled(guideAvailable)
->>>>>>> Add guide/SimplePageCreate
-=======
->>>>>>> Current progress on Guide reintegration
                 .build("button.guide");
 
         final UIButton mapButton = new UIButtonBuilder(this)
@@ -207,7 +192,7 @@ public final class SimpleIngameMenu extends SimpleScreen {
                 break;
             case "button.guide":
                 if (this.mc.player != null) {
-                    new SimplePageView().display();
+                    network.sendToServer(new ServerboundGuideOpenRequestPacket());
                 }
                 break;
             case "button.instance":

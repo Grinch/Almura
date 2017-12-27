@@ -164,8 +164,8 @@ public final class UIButtonBuilder {
         checkNotNull(id);
 
         final UIButton button = new UIButton(this.gui);
-        button.setPosition(this.x, this.y);
         button.setName(id);
+        button.setPosition(this.x, this.y);
 
         if (this.text != null) {
             button.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.text));

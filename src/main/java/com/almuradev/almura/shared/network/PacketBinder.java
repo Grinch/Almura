@@ -41,7 +41,7 @@ public class PacketBinder {
     /**
      * Create a binding entry for the specified packet.
      *
-     * <p>Bound packets will be installed into the network channel.</p>
+     * <p>Bound packets will be installed into the network discriminator.</p>
      *
      * @param packet the packet class
      * @param consumer the binder consumer

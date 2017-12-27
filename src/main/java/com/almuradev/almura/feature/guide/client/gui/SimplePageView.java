@@ -148,9 +148,9 @@ public class SimplePageView extends SimpleScreen {
         this.buttonFormat.setTooltip(TextSerializers.LEGACY_FORMATTING_CODE.serialize(
                 this.showRaw ? Text.of("Showing raw text") : Text.of("Showing formatted text")
         ));
-        this.buttonFormat.setDisabled(!(this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
-        this.buttonRemove.setDisabled(!(this.hasRemovePermission() && this.pagesSelect.getSelectedValue() != null));
-        this.buttonDetails.setDisabled(!(this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
+        this.buttonFormat.setEnabled((this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
+        this.buttonRemove.setEnabled((this.hasRemovePermission() && this.pagesSelect.getSelectedValue() != null));
+        this.buttonDetails.setEnabled((this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
     }
 
     @Subscribe
@@ -161,7 +161,7 @@ public class SimplePageView extends SimpleScreen {
             case "button.format":
                 this.showRaw = !this.showRaw;
                 this.updateButtons();
-                this.contentField.setText(PageUtil.replaceColorCodes("&", pagesSelect.getSelectedValue().getContents(), this.showRaw));
+                //this.contentField.setText(PageUtil.replaceColorCodes("&", pagesSelect.getSelectedValue().getContents(), this.showRaw));
 
                 break;
             case "button.add":
