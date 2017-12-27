@@ -5,13 +5,11 @@
  *
  * All Rights Reserved.
  */
-package com.almuradev.almura.feature.menu.guide;
+package com.almuradev.almura.feature.guide.client.gui;
 
-import com.almuradev.shared.client.ui.component.UIForm;
-import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
-import com.almuradev.shared.client.ui.component.dialog.MessageBoxButtons;
-import com.almuradev.shared.client.ui.component.dialog.UIMessageBox;
-import com.almuradev.shared.client.ui.screen.SimpleScreen;
+import com.almuradev.almura.shared.client.ui.component.UIForm;
+import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
 import com.almuradev.shared.util.Predicates;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
@@ -114,11 +112,11 @@ public class SimplePageCreate extends SimpleScreen {
                 if (textFieldFileName.getText().isEmpty() || textFieldIndex.getText().isEmpty() || textFieldTitle.getText().isEmpty()) {
                     break;
                 }
-                if (!PageRegistry.getPage(textFieldFileName.getText()).isPresent()) {
-                    UIMessageBox.showDialog(this, "Page already exists!", "The filename is already in use by another page. Please check the "
-                                    + "filename and try again.", MessageBoxButtons.OK);
-                    break;
-                }
+//                if (!PageRegistry.getPage(textFieldFileName.getText()).isPresent()) {
+//                    UIMessageBox.showDialog(this, "Page already exists!", "The filename is already in use by another page. Please check the "
+//                                    + "filename and try again.", MessageBoxButtons.OK);
+//                    break;
+//                }
 
                 // TODO: Packet to server
                 close();

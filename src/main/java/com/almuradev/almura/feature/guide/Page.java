@@ -5,7 +5,9 @@
  *
  * All Rights Reserved.
  */
-package com.almuradev.almura.feature.menu.guide;
+package com.almuradev.almura.feature.guide;
+
+import com.google.common.base.MoreObjects;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -107,16 +109,16 @@ public final class Page {
 
     @Override
     public String toString() {
-        return "Page { " +
-                "identifier= [" + identifier + "]" +
-                ", index= [" + index + "]" +
-                ", created= [" + created + "]" +
-                ", lastModified= [" + lastModified + "]" +
-                ", title= [" + name + "]" +
-                ", author= [" + author + "]" +
-                ", lastContributor= [" + lastContributor + "]" +
-                ", contents= [" + contents + "]" +
-                " }";
+        return MoreObjects.toStringHelper(this)
+                .add("identifier", this.identifier)
+                .add("index", this.index)
+                .add("created", this.created)
+                .add("lastModified", this.lastModified)
+                .add("name", this.name)
+                .add("author", this.author)
+                .add("lastContributor", this.lastContributor)
+                .add("contents", this.contents)
+                .toString();
     }
 
     public static class PageIndexComparator implements Comparator<Page> {

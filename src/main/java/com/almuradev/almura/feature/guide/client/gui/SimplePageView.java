@@ -5,11 +5,12 @@
  *
  * All Rights Reserved.
  */
-package com.almuradev.almura.feature.menu.guide;
+package com.almuradev.almura.feature.guide.client.gui;
 
-import com.almuradev.shared.client.ui.component.UIForm;
-import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
-import com.almuradev.shared.client.ui.screen.SimpleScreen;
+import com.almuradev.almura.feature.guide.Page;
+import com.almuradev.almura.shared.client.ui.component.UIForm;
+import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
 import net.malisis.core.client.gui.component.interaction.UIButton;

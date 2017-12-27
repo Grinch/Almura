@@ -7,6 +7,7 @@
  */
 package com.almuradev.almura.feature.menu.game;
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 import com.almuradev.almura.shared.client.GuiConfig;
@@ -18,6 +19,9 @@ import com.almuradev.almura.feature.menu.guide.SimplePageCreate;
 =======
 import com.almuradev.almura.feature.menu.guide.SimplePageView;
 >>>>>>> Current progress on Guide reintegration
+=======
+import com.almuradev.almura.feature.guide.client.gui.SimplePageView;
+>>>>>>> Stashed changes
 import com.almuradev.shared.client.GuiConfig;
 import com.almuradev.shared.client.ui.FontColors;
 import com.almuradev.shared.client.ui.component.button.UIButtonBuilder;
