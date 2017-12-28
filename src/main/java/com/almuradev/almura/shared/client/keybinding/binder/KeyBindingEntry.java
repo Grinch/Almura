@@ -20,7 +20,6 @@ public final class KeyBindingEntry {
     }
 
     public void install(final Injector injector) {
-        // TODO Cannot inject the ClientRegistry in Forge without more magic. kashike thing.
         ClientRegistry.registerKeyBinding(this.keybinding);
     }
 
