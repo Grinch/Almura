@@ -7,6 +7,8 @@
  */
 package com.almuradev.almura.feature.guide;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.almuradev.almura.feature.guide.network.ClientboundPageListingsPacket;
 import com.almuradev.almura.shared.event.Witness;
 import com.almuradev.almura.shared.network.NetworkConfig;
@@ -204,6 +206,17 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
         }
 
         return loaded;
+    }
+
+    public void putPage(String id, Page page) {
+        checkNotNull(id);
+        checkNotNull(page);
+
+        this.pages.put(id, page);
+    }
+
+    public void removePage(String id) {
+        this.pages.remove(id);
     }
 
     private static final class PageWalker implements FileVisitor<Path> {

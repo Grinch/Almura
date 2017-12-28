@@ -79,7 +79,7 @@ public final class ServerTitleManager extends Witness.Impl implements Witness.Li
     }
 
     @Listener
-    public void onServerStarting(GameStartingServerEvent event) {
+    public void onGameStartingServer(GameStartingServerEvent event) {
         this.titlesByPermission.clear();
 
         try {

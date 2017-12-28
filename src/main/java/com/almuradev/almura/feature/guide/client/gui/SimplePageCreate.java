@@ -10,7 +10,6 @@ package com.almuradev.almura.feature.guide.client.gui;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
-import com.almuradev.shared.util.Predicates;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
 import net.malisis.core.client.gui.component.UIComponent;
@@ -63,7 +62,7 @@ public class SimplePageCreate extends SimpleScreen {
         this.textFieldIndex.setAnchor(Anchor.TOP | Anchor.LEFT);
         this.textFieldIndex.setPosition(0, SimpleScreen.getPaddedY(labelIndex, 1));
         this.textFieldIndex.setSize(UIComponent.INHERITED, 0);
-        this.textFieldIndex.setValidator(new Predicates.IntegerFilterPredicate());
+        //this.textFieldIndex.setValidator(new Predicates.IntegerFilterPredicate());
 
         // Title
         final UILabel labelTitle = new UILabel(this, I18n.format("almura.guide.create.title"));
@@ -74,7 +73,7 @@ public class SimplePageCreate extends SimpleScreen {
         this.textFieldTitle.setAnchor(Anchor.TOP | Anchor.LEFT);
         this.textFieldTitle.setPosition(0, SimpleScreen.getPaddedY(labelTitle, 1));
         this.textFieldTitle.setSize(UIComponent.INHERITED, 0);
-        this.textFieldTitle.setValidator(new Predicates.StringLengthPredicate(1, 100));
+        //this.textFieldTitle.setValidator(new Predicates.StringLengthPredicate(1, 100));
 
         // Save/Cancel
         final UIButton buttonSave = new UIButtonBuilder(this)

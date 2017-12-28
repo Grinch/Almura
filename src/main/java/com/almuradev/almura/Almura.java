@@ -41,7 +41,7 @@ public class Almura {
     }
 
     @Listener
-    public void gameStopping(final GameStoppingEvent event) {
+    public void onGameStoppingEvent(final GameStoppingEvent event) {
         proxy.destruct();
     }
 }
