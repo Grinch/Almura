@@ -7,6 +7,7 @@
  */
 package com.almuradev.almura.feature.guide.client.gui;
 
+import com.almuradev.almura.feature.guide.ClientPageManager;
 import com.almuradev.almura.feature.guide.Page;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
@@ -24,14 +25,18 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+import javax.inject.Inject;
+
 @SideOnly(Side.CLIENT)
 public class SimplePageView extends SimpleScreen {
 
+    @Inject
+    private static ClientPageManager PAGE_MANAGER;
     private static final int INNER_PADDING = 2;
 
     private boolean showRaw = false;
     private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
-    private UISelect<Page> pagesSelect;
+    private UISelect<String> pagesSelect;
     private UITextField contentField;
 
     @Override
@@ -126,6 +131,18 @@ public class SimplePageView extends SimpleScreen {
         this.updateButtons();
     }
 
+    public void refreshPages() {
+        pagesSelect.setOptions(PAGE_MANAGER.getPageNames());
+        pagesSelect.selectFirst();
+    }
+
+    public void refreshPage() {
+        if (PAGE_MANAGER.getPage() != null) {
+            this.contentField.setText(PAGE_MANAGER.getPage().getContent());
+        }
+        this.updateButtons();
+    }
+
     private boolean hasAnyPermission() {
         return this.hasEditPermission() || this.hasRemovePermission() || this.hasAddPermission();
     }
@@ -148,20 +165,26 @@ public class SimplePageView extends SimpleScreen {
         this.buttonFormat.setTooltip(TextSerializers.LEGACY_FORMATTING_CODE.serialize(
                 this.showRaw ? Text.of("Showing raw text") : Text.of("Showing formatted text")
         ));
-        this.buttonFormat.setEnabled((this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
-        this.buttonRemove.setEnabled((this.hasRemovePermission() && this.pagesSelect.getSelectedValue() != null));
-        this.buttonDetails.setEnabled((this.hasAnyPermission() && this.pagesSelect.getSelectedValue() != null));
+        this.buttonFormat.setEnabled((this.hasAnyPermission() && PAGE_MANAGER.getPage() != null));
+        this.buttonRemove.setEnabled((this.hasRemovePermission() && PAGE_MANAGER.getPage() != null));
+        this.buttonDetails.setEnabled((this.hasAnyPermission() && PAGE_MANAGER.getPage() != null));
     }
 
     @Subscribe
     public void onUIButtonClickEvent(UIButton.ClickEvent event) {
         switch (event.getComponent().getName().toLowerCase()) {
             case "button.details":
-
             case "button.format":
                 this.showRaw = !this.showRaw;
                 this.updateButtons();
-                //this.contentField.setText(PageUtil.replaceColorCodes("&", pagesSelect.getSelectedValue().getContents(), this.showRaw));
+
+                final String currentContent = this.contentField.getText();
+                if (showRaw) {
+                    this.contentField.setText(TextSerializers.FORMATTING_CODE.deserialize(currentContent).toPlain());
+                } else {
+                    this.contentField.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(Text.of(
+                            TextSerializers.FORMATTING_CODE.serialize(Text.of(currentContent)))));
+                }
 
                 break;
             case "button.add":

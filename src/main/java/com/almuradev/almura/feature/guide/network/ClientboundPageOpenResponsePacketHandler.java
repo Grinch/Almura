@@ -8,6 +8,8 @@
 package com.almuradev.almura.feature.guide.network;
 
 import com.almuradev.almura.feature.guide.ClientPageManager;
+import com.almuradev.almura.feature.guide.client.gui.SimplePageView;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Platform;
@@ -30,6 +32,8 @@ public final class ClientboundPageOpenResponsePacketHandler implements MessageHa
     public void handleMessage(ClientboundPageOpenResponsePacket message, RemoteConnection connection, Platform.Type side) {
         this.manager.setPage(message.page);
 
-        // TODO Need to update the GUI for the page Grinch
+        if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {
+            ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPage();
+        }
     }
 }

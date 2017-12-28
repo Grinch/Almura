@@ -8,6 +8,8 @@
 package com.almuradev.almura.feature.guide.network;
 
 import com.almuradev.almura.feature.guide.ClientPageManager;
+import com.almuradev.almura.feature.guide.client.gui.SimplePageView;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.Platform;
@@ -30,6 +32,8 @@ public final class ClientboundPageListingsPacketHandler implements MessageHandle
     public void handleMessage(ClientboundPageListingsPacket message, RemoteConnection connection, Platform.Type side) {
         this.manager.setPageNames(message.pageNames);
 
-        // TODO Tell GUI to refresh list of page names Grinch
+        if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {
+            ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPages();
+        }
     }
 }
