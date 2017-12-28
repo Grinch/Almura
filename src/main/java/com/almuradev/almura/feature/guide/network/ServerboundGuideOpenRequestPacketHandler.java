@@ -56,10 +56,6 @@ public final class ServerboundGuideOpenRequestPacketHandler implements MessageHa
 
                 // Send the list of pages
                 this.network.sendTo(player, new ClientboundPageListingsPacket(pagesToSend.keySet()));
-
-                // Send the initial page
-                final Page page = pagesToSend.entrySet().stream().findFirst().get().getValue();
-                this.network.sendTo(player, new ClientboundPageOpenResponsePacket(page));
             }
         }
     }

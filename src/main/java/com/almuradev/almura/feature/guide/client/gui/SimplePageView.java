@@ -18,6 +18,8 @@ import net.malisis.core.client.gui.component.interaction.UIButton;
 import net.malisis.core.client.gui.component.interaction.UISelect;
 import net.malisis.core.client.gui.component.interaction.UITextField;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.text.Text;
@@ -30,9 +32,10 @@ import javax.inject.Inject;
 @SideOnly(Side.CLIENT)
 public class SimplePageView extends SimpleScreen {
 
-    @Inject
-    private static ClientPageManager PAGE_MANAGER;
     private static final int INNER_PADDING = 2;
+
+    @Inject
+    private static ClientPageManager manager;
 
     private boolean showRaw = false;
     private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
@@ -83,7 +86,9 @@ public class SimplePageView extends SimpleScreen {
 
         // Pages dropdown
         this.pagesSelect = new UISelect<>(this, SimpleScreen.getPaddedWidth(form));
+        this.pagesSelect.setName("combobox.pages");
         this.pagesSelect.setPosition(this.buttonRemove.isVisible() ? SimpleScreen.getPaddedX(this.buttonRemove, INNER_PADDING) : 0, 0);
+        this.pagesSelect.register(this);
         if (hasAnyPermission()) {
             this.pagesSelect.setSize(this.pagesSelect.getWidth() - this.buttonDetails.getWidth() - this.buttonAdd.getWidth() - this.buttonRemove
                     .getWidth() - (INNER_PADDING * 4) + 2, 15);
@@ -108,16 +113,16 @@ public class SimplePageView extends SimpleScreen {
         final UIButton buttonClose = new UIButtonBuilder(this)
                 .width(40)
                 .anchor(Anchor.BOTTOM | Anchor.RIGHT)
-                .text(Text.of("almura.menu.close"))
+                .text(Text.of("almura.guide.button.close"))
                 .listener(this)
                 .build("button.close");
 
-        // Close button
+        // Save button
         final UIButton buttonSave = new UIButtonBuilder(this)
                 .width(40)
                 .anchor(Anchor.BOTTOM | Anchor.RIGHT)
                 .x(SimpleScreen.getPaddedX(buttonClose, INNER_PADDING, Anchor.RIGHT))
-                .text(Text.of("almura.save"))
+                .text(Text.of("almura.guide.button.save"))
                 .visible(hasAnyPermission())
                 .enabled(hasEditPermission())
                 .listener(this)
@@ -131,14 +136,52 @@ public class SimplePageView extends SimpleScreen {
         this.updateButtons();
     }
 
+    @Subscribe
+    public void onUIButtonClickEvent(UIButton.ClickEvent event) {
+        switch (event.getComponent().getName().toLowerCase()) {
+            case "button.details":
+            case "button.format":
+                this.showRaw = !this.showRaw;
+                this.updateFormattingButton();
+
+                final String currentContent = this.contentField.getText();
+                if (showRaw) {
+                    // Need to convert the content from sectional -> ampersand
+                    this.contentField.setText(TextSerializers.FORMATTING_CODE.serialize(TextSerializers.LEGACY_FORMATTING_CODE.deserialize
+                            (currentContent)));
+                } else {
+                    // Need to convert the content from ampersand -> sectional
+                    this.contentField.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(TextSerializers.FORMATTING_CODE.deserialize
+                            (currentContent)));
+                }
+                break;
+            case "button.add":
+                new SimplePageCreate(this).display();
+                break;
+            case "button.close":
+                close();
+                break;
+        }
+    }
+
+    @Subscribe
+    public void onComboBoxSelect(UISelect.SelectEvent event) {
+        switch (event.getComponent().getName().toLowerCase()) {
+            case "combobox.pages": {
+                manager.requestPage(event.getNewValue().toString());
+            }
+        }
+    }
+
     public void refreshPages() {
-        pagesSelect.setOptions(PAGE_MANAGER.getPageNames());
+        pagesSelect.setOptions(manager.getPageNames());
+        // TODO Grinch, if you get a page refresh, might wanna check if their current page is still in the list and keep them selected on it
         pagesSelect.selectFirst();
     }
 
     public void refreshPage() {
-        if (PAGE_MANAGER.getPage() != null) {
-            this.contentField.setText(PAGE_MANAGER.getPage().getContent());
+        if (manager.getPage() != null) {
+            this.contentField.setText(manager.getPage().getContent());
         }
         this.updateButtons();
     }
@@ -160,39 +203,14 @@ public class SimplePageView extends SimpleScreen {
     }
 
     private void updateButtons() {
-        this.buttonFormat.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(
-                this.showRaw ? Text.of("Raw") : Text.of(TextStyles.ITALIC, "Formatted")));
-        this.buttonFormat.setTooltip(TextSerializers.LEGACY_FORMATTING_CODE.serialize(
-                this.showRaw ? Text.of("Showing raw text") : Text.of("Showing formatted text")
-        ));
-        this.buttonFormat.setEnabled((this.hasAnyPermission() && PAGE_MANAGER.getPage() != null));
-        this.buttonRemove.setEnabled((this.hasRemovePermission() && PAGE_MANAGER.getPage() != null));
-        this.buttonDetails.setEnabled((this.hasAnyPermission() && PAGE_MANAGER.getPage() != null));
+        this.updateFormattingButton();
+        this.buttonFormat.setEnabled((this.hasAnyPermission() && manager.getPage() != null));
+        this.buttonRemove.setEnabled((this.hasRemovePermission() && manager.getPage() != null));
+        this.buttonDetails.setEnabled((this.hasAnyPermission() && manager.getPage() != null));
     }
 
-    @Subscribe
-    public void onUIButtonClickEvent(UIButton.ClickEvent event) {
-        switch (event.getComponent().getName().toLowerCase()) {
-            case "button.details":
-            case "button.format":
-                this.showRaw = !this.showRaw;
-                this.updateButtons();
-
-                final String currentContent = this.contentField.getText();
-                if (showRaw) {
-                    this.contentField.setText(TextSerializers.FORMATTING_CODE.deserialize(currentContent).toPlain());
-                } else {
-                    this.contentField.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(Text.of(
-                            TextSerializers.FORMATTING_CODE.serialize(Text.of(currentContent)))));
-                }
-
-                break;
-            case "button.add":
-                new SimplePageCreate(this).display();
-                break;
-            case "button.close":
-                close();
-                break;
-        }
+    private void updateFormattingButton() {
+        this.buttonFormat.setText(this.showRaw ? "Raw" : TextFormatting.ITALIC + "Formatted");
+        this.buttonFormat.setTooltip(this.showRaw ? "Showing raw text" : "Showing formatted text");
     }
 }

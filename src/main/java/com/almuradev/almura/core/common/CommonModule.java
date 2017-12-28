@@ -33,8 +33,7 @@ public final class CommonModule extends AbstractModule implements CommonBinder {
         this.bind(Path.class).annotatedWith(Names.named("assets")).toInstance(Paths.get("assets"));
         this.facet()
                 .add(RegistryInstaller.class)
-                .add(CommandInstaller.class)
-                .add(KeyBindingInstaller.class);
+                .add(CommandInstaller.class);
         this.registry().module(BossBarColorRegistryModule.class);
         this.install(new NetworkModule());
         this.install(new WitnessModule());

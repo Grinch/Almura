@@ -27,6 +27,7 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
 
     @Override
     protected void configure() {
+        this.command().child(GuideCommands.generateGuideCommand(), "guide");
         this.packet()
                 .bind(ServerboundGuideOpenRequestPacket.class, binder -> binder.handler(ServerboundGuideOpenRequestPacketHandler.class, Platform
                         .Type.SERVER))
@@ -35,8 +36,9 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
                         .SERVER))
                 .bind(ClientboundPageOpenResponsePacket.class, binder -> binder.handler(ClientboundPageOpenResponsePacketHandler.class, Platform.Type.CLIENT))
                 .bind(ClientboundPageListingsPacket.class, binder -> binder.handler(ClientboundPageListingsPacketHandler.class, Platform.Type.CLIENT));
-        this.facet().add(ServerPageManager.class);
 
+        this.facet().add(ServerPageManager.class);
+        this.requestStaticInjection(GuideCommands.class);
         if (Sponge.getPlatform().getType().isClient()) {
             this.requestStaticInjection(SimplePageView.class);
         }

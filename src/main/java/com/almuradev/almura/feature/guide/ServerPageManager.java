@@ -7,7 +7,9 @@
  */
 package com.almuradev.almura.feature.guide;
 
+import com.almuradev.almura.feature.guide.network.ClientboundPageListingsPacket;
 import com.almuradev.almura.shared.event.Witness;
+import com.almuradev.almura.shared.network.NetworkConfig;
 import com.typesafe.config.ConfigRenderOptions;
 import net.kyori.membrane.facet.Activatable;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -22,6 +24,8 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.network.ChannelId;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -50,13 +54,16 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
     private final Game game;
     private final Logger logger;
     private final Path configRoot;
+    private final ChannelBinding.IndexedMessageChannel network;
     private final Map<String, Page> pages = new HashMap<>();
 
     @Inject
-    public ServerPageManager(final Game game, Logger logger, @ConfigDir(sharedRoot = false) final Path configRoot) {
+    public ServerPageManager(final Game game, Logger logger, @ConfigDir(sharedRoot = false) final Path configRoot, final @ChannelId(NetworkConfig
+            .CHANNEL) ChannelBinding.IndexedMessageChannel network) {
         this.game = game;
         this.logger = logger;
         this.configRoot = configRoot.resolve(GuideConfig.DIR_GUIDE);
+        this.network = network;
     }
 
     @Override
@@ -71,8 +78,12 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
 
     @Listener
     public void onGameStartingServer(GameStartingServerEvent event) throws IOException {
+        this.loadPages();
+    }
+
+    private boolean loadPages() throws IOException {
         this.pages.clear();
-        
+
         if (Files.notExists(this.configRoot)) {
             Files.createDirectories(this.configRoot);
         }
@@ -152,6 +163,8 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
         });
 
         this.logger.info("Loaded " + this.pages.size() + " page(s).");
+
+        return true;
     }
 
     private ConfigurationLoader<CommentedConfigurationNode> createLoader(Path path) {
@@ -180,6 +193,17 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
 
     public Optional<Page> getPage(String id) {
         return Optional.ofNullable(this.pages.get(id));
+    }
+
+    public boolean loadAndSyncPages() throws IOException {
+        final boolean loaded = this.loadPages();
+        if (loaded) {
+            this.game.getServer().getOnlinePlayers().forEach((player) -> {
+                this.network.sendTo(player, new ClientboundPageListingsPacket(this.getAvailablePagesFor(player).keySet()));
+            });
+        }
+
+        return loaded;
     }
 
     private static final class PageWalker implements FileVisitor<Path> {

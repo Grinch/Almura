@@ -7,7 +7,10 @@
  */
 package com.almuradev.almura.feature.guide;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacket;
+import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacket;
 import com.almuradev.almura.shared.client.keybinding.binder.KeyBindingEntry;
 import com.almuradev.almura.shared.event.Witness;
 import com.almuradev.almura.shared.network.NetworkConfig;
@@ -38,7 +41,8 @@ public final class ClientPageManager implements Witness {
     private Page page;
 
     @Inject
-    public ClientPageManager(@ChannelId(NetworkConfig.CHANNEL) ChannelBinding.IndexedMessageChannel network, Set<KeyBindingEntry> keybindings) {
+    public ClientPageManager(final @ChannelId(NetworkConfig.CHANNEL) ChannelBinding.IndexedMessageChannel network, final Set<KeyBindingEntry>
+            keybindings) {
         this.network = network;
         this.guideOpenBinding = keybindings.stream().map(KeyBindingEntry::getKeybinding).filter((keyBinding -> keyBinding
                 .getKeyDescription().equalsIgnoreCase("key.almura.guide.open"))).findFirst().orElse(null);
@@ -68,5 +72,11 @@ public final class ClientPageManager implements Witness {
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+    public void requestPage(String pageId) {
+        checkNotNull(pageId);
+
+        this.network.sendToServer(new ServerboundPageOpenRequestPacket(pageId));
     }
 }
