@@ -8,6 +8,8 @@
 package com.almuradev.almura.feature.guide;
 
 import com.google.common.base.MoreObjects;
+import org.spongepowered.common.text.SpongeTexts;
+import org.spongepowered.common.text.serializer.LegacyTexts;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -107,6 +109,14 @@ public final class Page {
     @Override
     public int hashCode() {
         return this.id.hashCode();
+    }
+
+    public static String asUglyText(final String string) {
+        return LegacyTexts.replace(string, '&', SpongeTexts.COLOR_CHAR);
+    }
+
+    public static String asFriendlyText(final String string) {
+        return LegacyTexts.replace(string, SpongeTexts.COLOR_CHAR, '&');
     }
 
     @Override

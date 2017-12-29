@@ -8,6 +8,7 @@
 package com.almuradev.almura.feature.guide.client.gui;
 
 import com.almuradev.almura.feature.guide.ClientPageManager;
+import com.almuradev.almura.feature.guide.Page;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
@@ -22,7 +23,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.inject.Inject;
 
@@ -144,12 +144,10 @@ public class SimplePageView extends SimpleScreen {
                 final String currentContent = this.contentField.getText();
                 if (showRaw) {
                     // Need to convert the content from sectional -> ampersand
-                    this.contentField.setText(TextSerializers.FORMATTING_CODE.serialize(TextSerializers.LEGACY_FORMATTING_CODE.deserialize
-                            (currentContent)));
+                    this.contentField.setText(Page.asFriendlyText(currentContent));
                 } else {
                     // Need to convert the content from ampersand -> sectional
-                    this.contentField.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(TextSerializers.FORMATTING_CODE.deserialize
-                            (currentContent)));
+                    this.contentField.setText(Page.asUglyText(currentContent));
                 }
                 break;
             case "button.add":

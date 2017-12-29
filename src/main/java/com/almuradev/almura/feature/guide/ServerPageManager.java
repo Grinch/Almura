@@ -28,7 +28,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.common.text.SpongeTexts;
+import org.spongepowered.common.text.serializer.LegacyTexts;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -255,8 +256,7 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
         createdNode.getNode(GuideConfig.Created.TIME).setValue(page.getCreated());
 
         // Packet sends up as sectional, since I am a nice guy I'll let them save as ampersand
-        rootNode.getNode(GuideConfig.CONTENT).setValue(TextSerializers.FORMATTING_CODE.serialize(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(page
-                .getContent())));
+        rootNode.getNode(GuideConfig.CONTENT).setValue(Page.asFriendlyText(page.getContent()));
 
         try {
             loader.save(rootNode);
