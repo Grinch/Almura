@@ -8,6 +8,7 @@
 package com.almuradev.almura.feature.guide.network;
 
 import com.almuradev.almura.feature.guide.Page;
+import com.almuradev.almura.feature.guide.PageListEntry;
 import com.almuradev.almura.feature.guide.ServerPageManager;
 import com.almuradev.almura.shared.network.NetworkConfig;
 import org.spongepowered.api.Game;
@@ -20,6 +21,7 @@ import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.network.RemoteConnection;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -47,7 +49,8 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
             if (message.changeType == PageChangeType.ADD) {
                 // If the id being sent up is already in the manager, we've got a desync
                 if (page != null) {
-                    this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).keySet()));
+                    this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).entrySet().stream().map
+                            (entry -> new PageListEntry(entry.getKey(), entry.getValue().getName())).collect(Collectors.toSet())));
                     return;
                 } else {
                     if (!player.hasPermission("almura.guide.add")) {
@@ -65,7 +68,8 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
             } else if (message.changeType == PageChangeType.MODIFY || message.changeType == PageChangeType.REMOVE) {
                 // Sent up a modify or remove of a page but someone deleted it, we've got a desync
                 if (page == null) {
-                    this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).keySet()));
+                    this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).entrySet().stream().map
+                            (entry -> new PageListEntry(entry.getKey(), entry.getValue().getName())).collect(Collectors.toSet())));
                     return;
                 }
 
@@ -99,7 +103,8 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
 
             // Sync the listings to everyone
             this.game.getServer().getOnlinePlayers().forEach((online) -> this.network.sendTo(online, new ClientboundPageListingsPacket(this.manager
-                    .getAvailablePagesFor(online).keySet())));
+                    .getAvailablePagesFor(online).entrySet().stream().map(entry -> new PageListEntry(entry.getKey(), entry.getValue().getName()))
+                    .collect(Collectors.toSet()))));
         }
     }
 }

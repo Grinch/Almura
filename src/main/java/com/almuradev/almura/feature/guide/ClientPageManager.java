@@ -9,7 +9,6 @@ package com.almuradev.almura.feature.guide;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.almuradev.almura.feature.guide.network.PageChangeType;
 import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacket;
@@ -39,7 +38,7 @@ public final class ClientPageManager implements Witness {
     private final ChannelBinding.IndexedMessageChannel network;
     private final KeyBinding guideOpenBinding;
 
-    private Set<String> pageNames = new HashSet<>();
+    private Set<PageListEntry> pageEntries = new HashSet<>();
     private Page page;
 
     @Inject
@@ -57,14 +56,14 @@ public final class ClientPageManager implements Witness {
         }
     }
 
-    public Set<String> getPageNames() {
-        return Collections.unmodifiableSet(this.pageNames);
+    public Set<PageListEntry> getPageEntries() {
+        return Collections.unmodifiableSet(this.pageEntries);
     }
 
-    public void setPageNames(Set<String> pageNames) {
-        this.pageNames.clear();
+    public void setPageEntries(Set<PageListEntry> pageEntries) {
+        this.pageEntries.clear();
 
-        this.pageNames.addAll(pageNames);
+        this.pageEntries.addAll(pageEntries);
     }
 
     @Nullable

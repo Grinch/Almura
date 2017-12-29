@@ -9,6 +9,7 @@ package com.almuradev.almura.feature.guide.client.gui;
 
 import com.almuradev.almura.feature.guide.ClientPageManager;
 import com.almuradev.almura.feature.guide.Page;
+import com.almuradev.almura.feature.guide.PageListEntry;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
@@ -36,7 +37,7 @@ public class SimplePageView extends SimpleScreen {
 
     private boolean showRaw = false;
     private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
-    private UISelect<String> pagesSelect;
+    private UISelect<PageListEntry> pagesSelect;
     private UITextField contentField;
 
     @Override
@@ -83,6 +84,7 @@ public class SimplePageView extends SimpleScreen {
 
         // Pages dropdown
         this.pagesSelect = new UISelect<>(this, SimpleScreen.getPaddedWidth(form));
+        this.pagesSelect.setLabelFunction(PageListEntry::getName);
         this.pagesSelect.setName("combobox.pages");
         this.pagesSelect.setPosition(this.buttonRemove.isVisible() ? SimpleScreen.getPaddedX(this.buttonRemove, INNER_PADDING) : 0, 0);
         this.pagesSelect.register(this);
@@ -104,7 +106,7 @@ public class SimplePageView extends SimpleScreen {
         contentField.setSize(SimpleScreen.getPaddedWidth(form),
                 SimpleScreen.getPaddedHeight(form) - this.pagesSelect.getHeight() - (INNER_PADDING * 2) - this.buttonFormat.getHeight());
         contentField.setPosition(0, SimpleScreen.getPaddedY(this.pagesSelect, INNER_PADDING));
-        contentField.setEditable(false);
+        contentField.setEditable(true);
 
         // Close button
         final UIButton buttonClose = new UIButtonBuilder(this)
@@ -153,6 +155,10 @@ public class SimplePageView extends SimpleScreen {
             case "button.add":
                 new SimplePageCreate(this).display();
                 break;
+            case "button.save":
+                if (manager.getPage() != null) {
+
+                }
             case "button.close":
                 close();
                 break;
@@ -163,13 +169,14 @@ public class SimplePageView extends SimpleScreen {
     public void onComboBoxSelect(UISelect.SelectEvent event) {
         switch (event.getComponent().getName().toLowerCase()) {
             case "combobox.pages": {
-                manager.requestPage(event.getNewValue().toString());
+                final PageListEntry entry = (PageListEntry) event.getNewValue();
+                manager.requestPage(entry.getId());
             }
         }
     }
 
-    public void refreshPages() {
-        pagesSelect.setOptions(manager.getPageNames());
+    public void refreshPageEntries() {
+        pagesSelect.setOptions(manager.getPageEntries());
         // TODO Grinch, if you get a page refresh, might wanna check if their current page is still in the list and keep them selected on it
         pagesSelect.selectFirst();
     }

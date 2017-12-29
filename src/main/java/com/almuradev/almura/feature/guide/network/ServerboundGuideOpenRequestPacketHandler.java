@@ -8,6 +8,7 @@
 package com.almuradev.almura.feature.guide.network;
 
 import com.almuradev.almura.feature.guide.Page;
+import com.almuradev.almura.feature.guide.PageListEntry;
 import com.almuradev.almura.feature.guide.ServerPageManager;
 import com.almuradev.almura.shared.network.NetworkConfig;
 import org.spongepowered.api.Platform;
@@ -19,6 +20,7 @@ import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.network.RemoteConnection;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -52,7 +54,8 @@ public final class ServerboundGuideOpenRequestPacketHandler implements MessageHa
             if (pagesToSend.size() > 0) {
 
                 // Send the list of pages
-                this.network.sendTo(player, new ClientboundPageListingsPacket(pagesToSend.keySet()));
+                this.network.sendTo(player, new ClientboundPageListingsPacket(pagesToSend.entrySet().stream().map(entry -> new PageListEntry
+                        (entry.getKey(), entry.getValue().getName())).collect(Collectors.toSet())));
             }
         }
     }

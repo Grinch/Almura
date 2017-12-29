@@ -30,10 +30,10 @@ public final class ClientboundPageListingsPacketHandler implements MessageHandle
     @SideOnly(Side.CLIENT)
     @Override
     public void handleMessage(ClientboundPageListingsPacket message, RemoteConnection connection, Platform.Type side) {
-        this.manager.setPageNames(message.pageNames);
+        this.manager.setPageEntries(message.pageEntries);
 
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {
-            ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPages();
+            ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPageEntries();
         }
     }
 }
