@@ -128,7 +128,7 @@ public class SimplePageCreate extends SimpleScreen {
                 final String name = this.textFieldTitle.getText();
                 final String title = this.textFieldTitle.getText();
 
-                manager.sendNewPage(id, index, name, title);
+                manager.requestNewPage(id, index, name, title);
 
                 close();
                 break;

@@ -11,7 +11,6 @@ import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.Message;
 
 public final class ClientboundGuideOpenResponsePacket implements Message {
-
     @Override
     public void readFrom(ChannelBuf buf) {
 

@@ -51,10 +51,12 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                     return;
                 } else {
                     if (!player.hasPermission("almura.guide.add")) {
-                        // TODO Tell the player they cannot add guides!
+                        this.network.sendTo(player, new ClientboundPageChangeResponsePacket(message.changeType, false, message.id, "You do not "
+                                + "have permission to add new pages!"));
                         return;
                     }
                     page = new Page(message.id, player.getUniqueId());
+                    page.setIndex(message.index);
                     page.setName(message.name);
                     page.setTitle(message.title);
                     page.setContent(message.content);
@@ -69,10 +71,12 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
 
                 if (message.changeType == PageChangeType.MODIFY) {
                     if (!player.hasPermission("almura.guide.modify." + message.id)) {
-                        // TODO Tell the player they cannot modify this guide!
+                        this.network.sendTo(player, new ClientboundPageChangeResponsePacket(message.changeType, false, message.id, "You do not "
+                                + "have permission to add modify this page!"));
                         return;
                     }
 
+                    page.setIndex(message.index);
                     page.setLastModifier(player.getUniqueId());
                     page.setLastModified(Instant.now());
                     page.setName(message.name);
@@ -80,7 +84,8 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                     page.setContent(message.content);
                 } else if (message.changeType == PageChangeType.REMOVE) {
                     if (!player.hasPermission("almura.guide.remove." + message.id)) {
-                        // TODO Tell the player they cannot remove the guide!
+                        this.network.sendTo(player, new ClientboundPageChangeResponsePacket(message.changeType, false, message.id, "You do not "
+                                + "have permission to remove this page!"));
                         return;
                     }
 

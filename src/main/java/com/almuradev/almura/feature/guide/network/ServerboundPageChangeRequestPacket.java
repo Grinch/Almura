@@ -20,8 +20,8 @@ public final class ServerboundPageChangeRequestPacket implements Message {
     public ServerboundPageChangeRequestPacket() {
     }
 
-    public ServerboundPageChangeRequestPacket(PageChangeType changeType, Page page) {
-        this.changeType = changeType;
+    public ServerboundPageChangeRequestPacket(Page page) {
+        this.changeType = PageChangeType.MODIFY;
         this.id = page.getId();
         this.index = page.getIndex();
         this.name = page.getName();
@@ -36,6 +36,11 @@ public final class ServerboundPageChangeRequestPacket implements Message {
         this.name = name;
         this.title = title;
         this.content = "";
+    }
+
+    public ServerboundPageChangeRequestPacket(String id) {
+        this.changeType = PageChangeType.REMOVE;
+        this.id = id;
     }
 
     @Override
