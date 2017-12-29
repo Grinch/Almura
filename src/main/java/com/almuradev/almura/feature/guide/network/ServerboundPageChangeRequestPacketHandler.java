@@ -30,7 +30,7 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
     private final ServerPageManager manager;
 
     @Inject
-    public ServerboundPageChangeRequestPacketHandler(final Game game, final @ChannelId(NetworkConfig.CHANNEL)ChannelBinding.IndexedMessageChannel
+    public ServerboundPageChangeRequestPacketHandler(final Game game, final @ChannelId(NetworkConfig.CHANNEL) ChannelBinding.IndexedMessageChannel
             network, final ServerPageManager manager) {
         this.game = game;
         this.network = network;
@@ -58,7 +58,7 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                     page.setName(message.name);
                     page.setTitle(message.title);
                     page.setContent(message.content);
-                    this.manager.putPage(message.id, page);
+                    this.manager.addPage(page);
                 }
             } else if (message.changeType == PageChangeType.MODIFY || message.changeType == PageChangeType.REMOVE) {
                 // Sent up a modify or remove of a page but someone deleted it, we've got a desync
@@ -69,7 +69,7 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
 
                 if (message.changeType == PageChangeType.MODIFY) {
                     if (!player.hasPermission("almura.guide.modify." + message.id)) {
-                        // TODO Tell the player they cannot modify this guide
+                        // TODO Tell the player they cannot modify this guide!
                         return;
                     }
 
@@ -80,16 +80,16 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                     page.setContent(message.content);
                 } else if (message.changeType == PageChangeType.REMOVE) {
                     if (!player.hasPermission("almura.guide.remove." + message.id)) {
-                        // TODO Tell the player they cannot remove this guide
+                        // TODO Tell the player they cannot remove the guide!
                         return;
                     }
 
-                    // TODO Need to delete the file on disk
+                    this.manager.deletePage(message.id);
                 }
             }
 
             if (message.changeType != PageChangeType.REMOVE) {
-                // TODO Need to actually have them save to the disk
+                this.manager.savePage(page);
             }
 
             // Sync the listings to everyone

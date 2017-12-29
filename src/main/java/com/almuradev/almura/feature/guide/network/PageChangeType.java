@@ -14,10 +14,14 @@ public enum PageChangeType {
 
     public static PageChangeType of(byte type) {
         switch (type) {
-            case 0: return ADD;
-            case 1: return MODIFY;
-            case 2: return REMOVE;
-            default: return null;
+            case 0:
+                return ADD;
+            case 1:
+                return MODIFY;
+            case 2:
+                return REMOVE;
+            default:
+                return null;
         }
     }
 }

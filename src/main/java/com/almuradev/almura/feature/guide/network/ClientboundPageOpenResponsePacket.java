@@ -18,7 +18,8 @@ public final class ClientboundPageOpenResponsePacket implements Message {
 
     public Page page;
 
-    public ClientboundPageOpenResponsePacket() {}
+    public ClientboundPageOpenResponsePacket() {
+    }
 
     public ClientboundPageOpenResponsePacket(Page page) {
         this.page = page;

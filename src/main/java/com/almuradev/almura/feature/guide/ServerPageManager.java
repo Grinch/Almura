@@ -28,6 +28,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -56,6 +57,7 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
     private final Game game;
     private final Logger logger;
     private final Path configRoot;
+    private final Path pageRoot;
     private final ChannelBinding.IndexedMessageChannel network;
     private final Map<String, Page> pages = new HashMap<>();
 
@@ -65,6 +67,7 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
         this.game = game;
         this.logger = logger;
         this.configRoot = configRoot.resolve(GuideConfig.DIR_GUIDE);
+        this.pageRoot = this.configRoot.resolve(GuideConfig.DIR_GUIDE_PAGES);
         this.network = network;
     }
 
@@ -90,13 +93,12 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
             Files.createDirectories(this.configRoot);
         }
 
-        final Path pagesRoot = this.configRoot.resolve(GuideConfig.DIR_GUIDE_PAGES);
-        if (Files.notExists(pagesRoot)) {
-            Files.createDirectories(pagesRoot);
+        if (Files.notExists(this.pageRoot)) {
+            Files.createDirectories(this.pageRoot);
         }
 
         final PageWalker pageWalker = new PageWalker(this.logger);
-        Files.walkFileTree(pagesRoot, pageWalker);
+        Files.walkFileTree(this.pageRoot, pageWalker);
 
         pageWalker.found.forEach((pageFile) -> {
             final ConfigurationLoader<CommentedConfigurationNode> loader = this.createLoader(pageFile);
@@ -170,6 +172,8 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
     }
 
     private ConfigurationLoader<CommentedConfigurationNode> createLoader(Path path) {
+        checkNotNull(path);
+
         return HoconConfigurationLoader.builder()
                 .setPath(path)
                 .setDefaultOptions(ConfigurationOptions.defaults())
@@ -183,6 +187,8 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
     }
 
     public Map<String, Page> getAvailablePagesFor(Player player) {
+        checkNotNull(player);
+
         return this.pages.entrySet()
                 .stream()
                 .filter(entry -> player.hasPermission("almura.guide.page." + entry.getKey()))
@@ -208,18 +214,58 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
         return loaded;
     }
 
-    public void putPage(String id, Page page) {
-        checkNotNull(id);
+    public void addPage(Page page) {
         checkNotNull(page);
 
-        this.pages.put(id, page);
+        this.pages.put(page.getId(), page);
     }
 
-    public void removePage(String id) {
-        this.pages.remove(id);
+    public void deletePage(String id) {
+        checkNotNull(id);
+
+        if (this.pages.remove(id) != null) {
+
+            final Path path = this.pageRoot.resolve(id + GuideConfig.EXT_CONFIG_PAGE);
+
+            try {
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void savePage(Page page) {
+        checkNotNull(page);
+
+        final Path path = this.pageRoot.resolve(page.getId());
+        final ConfigurationLoader<CommentedConfigurationNode> loader = this.createLoader(path);
+        final ConfigurationNode rootNode = loader.createEmptyNode();
+
+        rootNode.getNode(GuideConfig.INDEX).setValue(page.getIndex());
+        rootNode.getNode(GuideConfig.NAME).setValue(page.getName());
+        rootNode.getNode(GuideConfig.TITLE).setValue(page.getTitle());
+
+        final ConfigurationNode lastModifiedNode = rootNode.getNode(GuideConfig.LastModified.LAST_MODIFIED);
+        lastModifiedNode.getNode(GuideConfig.LastModified.MODIFIER).setValue(page.getLastModifier());
+        lastModifiedNode.getNode(GuideConfig.LastModified.TIME).setValue(page.getLastModified());
+
+        final ConfigurationNode createdNode = rootNode.getNode(GuideConfig.Created.CREATED);
+        createdNode.getNode(GuideConfig.Created.CREATOR).setValue(page.getCreator());
+        createdNode.getNode(GuideConfig.Created.TIME).setValue(page.getCreated());
+
+        // Packet sends up as sectional, since I am a nice guy I'll let them save as ampersand
+        rootNode.setValue(TextSerializers.FORMATTING_CODE.serialize(TextSerializers.LEGACY_FORMATTING_CODE.deserialize(page.getContent())));
+
+        try {
+            loader.save(rootNode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static final class PageWalker implements FileVisitor<Path> {
+
         private final Logger logger;
         private final Set<Path> found = new HashSet<>();
 

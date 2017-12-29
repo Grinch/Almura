@@ -7,6 +7,7 @@
  */
 package com.almuradev.almura.feature.guide.client.gui;
 
+import com.almuradev.almura.feature.guide.ClientPageManager;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
@@ -20,13 +21,19 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.api.text.Text;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 @SideOnly(Side.CLIENT)
 public class SimplePageCreate extends SimpleScreen {
 
     private static final int PADDING = 4;
+
+    @Inject
+    private static ClientPageManager manager;
+
     private UITextField textFieldFileName, textFieldIndex, textFieldTitle;
 
     public SimplePageCreate(@Nullable GuiScreen parent) {
@@ -77,14 +84,14 @@ public class SimplePageCreate extends SimpleScreen {
 
         // Save/Cancel
         final UIButton buttonSave = new UIButtonBuilder(this)
-                .text(I18n.format("almura.save"))
+                .text(Text.of("almura.guide.button.save"))
                 .anchor(Anchor.BOTTOM | Anchor.RIGHT)
                 .size(40, 20)
                 .listener(this)
                 .build("guide.create.save");
 
         final UIButton buttonCancel = new UIButtonBuilder(this)
-                .text(I18n.format("gui.cancel"))
+                .text(Text.of("almura.guide.button.cancel"))
                 .anchor(Anchor.BOTTOM | Anchor.RIGHT)
                 .position(SimpleScreen.getPaddedX(buttonSave, 2, Anchor.RIGHT), 0)
                 .size(40, 20)
@@ -92,9 +99,9 @@ public class SimplePageCreate extends SimpleScreen {
                 .build("guide.create.cancel");
 
         form.add(labelFileName, this.textFieldFileName,
-                 labelIndex, this.textFieldIndex,
-                 labelTitle, this.textFieldTitle,
-                 buttonCancel, buttonSave);
+                labelIndex, this.textFieldIndex,
+                labelTitle, this.textFieldTitle,
+                buttonCancel, buttonSave);
 
         addToScreen(form);
     }
@@ -106,18 +113,23 @@ public class SimplePageCreate extends SimpleScreen {
                 close();
                 break;
             case "guide.create.save":
-                // TODO: Permission check
                 textFieldFileName.setText(textFieldFileName.getText().trim());
+                // TODO Grinch, Index can be empty, just assume 0
+                // TODO Grinch, Title being empty should just use the filename
                 if (textFieldFileName.getText().isEmpty() || textFieldIndex.getText().isEmpty() || textFieldTitle.getText().isEmpty()) {
                     break;
                 }
-//                if (!PageRegistry.getPage(textFieldFileName.getText()).isPresent()) {
-//                    UIMessageBox.showDialog(this, "Page already exists!", "The filename is already in use by another page. Please check the "
-//                                    + "filename and try again.", MessageBoxButtons.OK);
-//                    break;
-//                }
 
-                // TODO: Packet to server
+                // TODO Grinch, page ids must be lowercase
+                final String id = this.textFieldFileName.getText();
+                // TODO Grinch, validators above need to be restored
+                final int index = Integer.parseInt(this.textFieldIndex.getText());
+                // TODO Grinch, where is Name?
+                final String name = this.textFieldTitle.getText();
+                final String title = this.textFieldTitle.getText();
+
+                manager.sendNewPage(id, index, name, title);
+
                 close();
                 break;
         }

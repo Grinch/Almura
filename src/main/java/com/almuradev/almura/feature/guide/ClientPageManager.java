@@ -10,6 +10,7 @@ package com.almuradev.almura.feature.guide;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacket;
+import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacket;
 import com.almuradev.almura.shared.client.keybinding.binder.KeyBindingEntry;
 import com.almuradev.almura.shared.event.Witness;
@@ -78,5 +79,9 @@ public final class ClientPageManager implements Witness {
         checkNotNull(pageId);
 
         this.network.sendToServer(new ServerboundPageOpenRequestPacket(pageId));
+    }
+
+    public void sendNewPage(String id, int index, String name, String title) {
+        this.network.sendToServer(new ServerboundPageChangeRequestPacket(id, index, name, title));
     }
 }

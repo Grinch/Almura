@@ -13,6 +13,10 @@ public interface GuideConfig {
 
     String DIR_GUIDE_PAGES = "pages";
 
+    String EXT_CONFIG = ".conf";
+
+    String EXT_CONFIG_PAGE = ".conf";
+
     String NAME = "name";
 
     String TITLE = "title";

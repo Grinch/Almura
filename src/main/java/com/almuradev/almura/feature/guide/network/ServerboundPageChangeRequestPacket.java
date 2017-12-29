@@ -15,15 +15,27 @@ public final class ServerboundPageChangeRequestPacket implements Message {
 
     public PageChangeType changeType;
     public String id, name, title, content;
+    public int index;
 
-    public ServerboundPageChangeRequestPacket() {}
+    public ServerboundPageChangeRequestPacket() {
+    }
 
     public ServerboundPageChangeRequestPacket(PageChangeType changeType, Page page) {
         this.changeType = changeType;
         this.id = page.getId();
+        this.index = page.getIndex();
         this.name = page.getName();
         this.title = page.getTitle();
         this.content = page.getContent();
+    }
+
+    public ServerboundPageChangeRequestPacket(String id, int index, String name, String title) {
+        this.changeType = PageChangeType.ADD;
+        this.id = id;
+        this.index = index;
+        this.name = name;
+        this.title = title;
+        this.content = "";
     }
 
     @Override
@@ -32,6 +44,7 @@ public final class ServerboundPageChangeRequestPacket implements Message {
         if (this.changeType != null) {
             this.id = buf.readString();
             if (this.changeType != PageChangeType.REMOVE) {
+                this.index = buf.readInteger();
                 this.name = buf.readString();
                 this.title = buf.readString();
                 this.content = buf.readString();
@@ -44,6 +57,7 @@ public final class ServerboundPageChangeRequestPacket implements Message {
         buf.writeByte((byte) this.changeType.ordinal());
         buf.writeString(this.id);
         if (this.changeType != PageChangeType.REMOVE) {
+            buf.writeInteger(this.index);
             buf.writeString(this.name);
             buf.writeString(this.title);
             buf.writeString(this.content);

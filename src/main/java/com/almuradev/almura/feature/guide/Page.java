@@ -10,8 +10,6 @@ package com.almuradev.almura.feature.guide;
 import com.google.common.base.MoreObjects;
 
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.UUID;
 
 public final class Page {

@@ -31,11 +31,14 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
         this.packet()
                 .bind(ServerboundGuideOpenRequestPacket.class, binder -> binder.handler(ServerboundGuideOpenRequestPacketHandler.class, Platform
                         .Type.SERVER))
-                .bind(ClientboundGuideOpenResponsePacket.class, binder -> binder.handler(ClientboundGuideOpenResponsePacketHandler.class, Platform.Type.CLIENT))
+                .bind(ClientboundGuideOpenResponsePacket.class,
+                        binder -> binder.handler(ClientboundGuideOpenResponsePacketHandler.class, Platform.Type.CLIENT))
                 .bind(ServerboundPageOpenRequestPacket.class, binder -> binder.handler(ServerboundPageOpenRequestPacketHandler.class, Platform.Type
                         .SERVER))
-                .bind(ClientboundPageOpenResponsePacket.class, binder -> binder.handler(ClientboundPageOpenResponsePacketHandler.class, Platform.Type.CLIENT))
-                .bind(ClientboundPageListingsPacket.class, binder -> binder.handler(ClientboundPageListingsPacketHandler.class, Platform.Type.CLIENT));
+                .bind(ClientboundPageOpenResponsePacket.class,
+                        binder -> binder.handler(ClientboundPageOpenResponsePacketHandler.class, Platform.Type.CLIENT))
+                .bind(ClientboundPageListingsPacket.class,
+                        binder -> binder.handler(ClientboundPageListingsPacketHandler.class, Platform.Type.CLIENT));
 
         this.facet().add(ServerPageManager.class);
         this.requestStaticInjection(GuideCommands.class);

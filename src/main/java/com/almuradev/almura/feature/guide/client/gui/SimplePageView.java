@@ -8,7 +8,6 @@
 package com.almuradev.almura.feature.guide.client.gui;
 
 import com.almuradev.almura.feature.guide.ClientPageManager;
-import com.almuradev.almura.feature.guide.Page;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
@@ -19,12 +18,10 @@ import net.malisis.core.client.gui.component.interaction.UISelect;
 import net.malisis.core.client.gui.component.interaction.UITextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import javax.inject.Inject;

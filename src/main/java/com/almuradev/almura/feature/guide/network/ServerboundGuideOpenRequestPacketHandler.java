@@ -18,10 +18,7 @@ import org.spongepowered.api.network.MessageHandler;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.network.RemoteConnection;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -31,7 +28,7 @@ public final class ServerboundGuideOpenRequestPacketHandler implements MessageHa
     private final ServerPageManager manager;
 
     @Inject
-    public ServerboundGuideOpenRequestPacketHandler(final @ChannelId(NetworkConfig.CHANNEL)ChannelBinding.IndexedMessageChannel network,
+    public ServerboundGuideOpenRequestPacketHandler(final @ChannelId(NetworkConfig.CHANNEL) ChannelBinding.IndexedMessageChannel network,
             final ServerPageManager manager) {
         this.network = network;
         this.manager = manager;

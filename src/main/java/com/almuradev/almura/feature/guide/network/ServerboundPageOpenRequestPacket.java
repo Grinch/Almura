@@ -14,7 +14,8 @@ public final class ServerboundPageOpenRequestPacket implements Message {
 
     public String id;
 
-    public ServerboundPageOpenRequestPacket() {}
+    public ServerboundPageOpenRequestPacket() {
+    }
 
     public ServerboundPageOpenRequestPacket(String id) {
         this.id = id;

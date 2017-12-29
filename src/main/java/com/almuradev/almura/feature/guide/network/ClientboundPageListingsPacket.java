@@ -10,7 +10,6 @@ package com.almuradev.almura.feature.guide.network;
 import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.Message;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

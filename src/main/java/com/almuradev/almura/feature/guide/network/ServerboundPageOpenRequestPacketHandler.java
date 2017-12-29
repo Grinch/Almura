@@ -18,8 +18,6 @@ import org.spongepowered.api.network.MessageHandler;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.network.RemoteConnection;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 public final class ServerboundPageOpenRequestPacketHandler implements MessageHandler<ServerboundPageOpenRequestPacket> {
