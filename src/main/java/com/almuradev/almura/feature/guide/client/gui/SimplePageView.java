@@ -161,8 +161,13 @@ public class SimplePageView extends SimpleScreen {
                     final String content = this.contentField.getText();
                     page.setContent(content);
                     manager.requestSavePage();
-
                 }
+                break;
+            case "button.remove":
+                if (manager.getPage() != null) {
+                    manager.requestRemovePage(manager.getPage().getId());
+                }
+                break;
             case "button.close":
                 close();
                 break;
@@ -173,8 +178,12 @@ public class SimplePageView extends SimpleScreen {
     public void onComboBoxSelect(UISelect.SelectEvent event) {
         switch (event.getComponent().getName().toLowerCase()) {
             case "combobox.pages": {
-                final PageListEntry entry = (PageListEntry) event.getNewValue();
-                manager.requestPage(entry.getId());
+                if (event.getNewValue() == null) {
+                    this.contentField.setText("");
+                } else {
+                    final PageListEntry entry = (PageListEntry) event.getNewValue();
+                    manager.requestPage(entry.getId());
+                }
             }
         }
     }
