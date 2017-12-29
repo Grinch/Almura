@@ -59,10 +59,7 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                         return;
                     }
                     page = new Page(message.id, player.getUniqueId());
-                    page.setIndex(message.index);
-                    page.setName(message.name);
-                    page.setTitle(message.title);
-                    page.setContent(message.content);
+
                     this.manager.addPage(page);
                 }
             } else if (message.changeType == PageChangeType.MODIFY || message.changeType == PageChangeType.REMOVE) {
@@ -80,12 +77,6 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                         return;
                     }
 
-                    page.setIndex(message.index);
-                    page.setLastModifier(player.getUniqueId());
-                    page.setLastModified(Instant.now());
-                    page.setName(message.name);
-                    page.setTitle(message.title);
-                    page.setContent(message.content);
                 } else if (message.changeType == PageChangeType.REMOVE) {
                     if (!player.hasPermission("almura.guide.remove." + message.id)) {
                         this.network.sendTo(player, new ClientboundPageChangeResponsePacket(message.changeType, false, message.id, "You do not "
@@ -97,7 +88,14 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
                 }
             }
 
-            if (message.changeType != PageChangeType.REMOVE) {
+            if (message.changeType != PageChangeType.REMOVE && page != null) {
+                page.setLastModifier(player.getUniqueId());
+                page.setLastModified(Instant.now());
+                page.setIndex(message.index);
+                page.setName(message.name);
+                page.setTitle(message.title);
+                page.setContent(message.content);
+
                 this.manager.savePage(page);
             }
 

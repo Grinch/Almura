@@ -10,6 +10,7 @@ package com.almuradev.almura.feature.guide;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.almuradev.almura.feature.guide.network.ClientboundPageListingsPacket;
+import com.almuradev.almura.shared.client.GuiConfig;
 import com.almuradev.almura.shared.event.Witness;
 import com.almuradev.almura.shared.network.NetworkConfig;
 import com.typesafe.config.ConfigRenderOptions;
@@ -233,7 +234,7 @@ public final class ServerPageManager extends Witness.Impl implements Witness.Lif
     public void savePage(Page page) {
         checkNotNull(page);
 
-        final Path path = this.pageRoot.resolve(page.getId());
+        final Path path = this.pageRoot.resolve(page.getId() + GuideConfig.EXT_CONFIG_PAGE);
         final ConfigurationLoader<CommentedConfigurationNode> loader = this.createLoader(path);
         final ConfigurationNode rootNode = loader.createEmptyNode();
 
@@ -242,12 +243,12 @@ public final class ServerPageManager extends Witness.Impl implements Witness.Lif
         rootNode.getNode(GuideConfig.TITLE).setValue(page.getTitle());
 
         final ConfigurationNode lastModifiedNode = rootNode.getNode(GuideConfig.LastModified.LAST_MODIFIED);
-        lastModifiedNode.getNode(GuideConfig.LastModified.MODIFIER).setValue(page.getLastModifier());
-        lastModifiedNode.getNode(GuideConfig.LastModified.TIME).setValue(page.getLastModified());
+        lastModifiedNode.getNode(GuideConfig.LastModified.MODIFIER).setValue(page.getLastModifier().toString());
+        lastModifiedNode.getNode(GuideConfig.LastModified.TIME).setValue(page.getLastModified().toString());
 
         final ConfigurationNode createdNode = rootNode.getNode(GuideConfig.Created.CREATED);
-        createdNode.getNode(GuideConfig.Created.CREATOR).setValue(page.getCreator());
-        createdNode.getNode(GuideConfig.Created.TIME).setValue(page.getCreated());
+        createdNode.getNode(GuideConfig.Created.CREATOR).setValue(page.getCreator().toString());
+        createdNode.getNode(GuideConfig.Created.TIME).setValue(page.getCreated().toString());
 
         // Packet sends up as sectional, since I am a nice guy I'll let them save as ampersand
         rootNode.getNode(GuideConfig.CONTENT).setValue(Page.asFriendlyText(page.getContent()));

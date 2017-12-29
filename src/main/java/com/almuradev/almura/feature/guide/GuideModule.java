@@ -7,15 +7,20 @@
  */
 package com.almuradev.almura.feature.guide;
 
+import com.almuradev.almura.feature.guide.client.gui.SimplePageCreate;
 import com.almuradev.almura.feature.guide.client.gui.SimplePageView;
 import com.almuradev.almura.feature.guide.network.ClientboundGuideOpenResponsePacket;
 import com.almuradev.almura.feature.guide.network.ClientboundGuideOpenResponsePacketHandler;
+import com.almuradev.almura.feature.guide.network.ClientboundPageChangeResponsePacket;
+import com.almuradev.almura.feature.guide.network.ClientboundPageChangeResponsePacketHandler;
 import com.almuradev.almura.feature.guide.network.ClientboundPageListingsPacket;
 import com.almuradev.almura.feature.guide.network.ClientboundPageListingsPacketHandler;
 import com.almuradev.almura.feature.guide.network.ClientboundPageOpenResponsePacket;
 import com.almuradev.almura.feature.guide.network.ClientboundPageOpenResponsePacketHandler;
 import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundGuideOpenRequestPacketHandler;
+import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPacket;
+import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPacketHandler;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacketHandler;
 import com.almuradev.almura.shared.inject.CommonBinder;
@@ -38,12 +43,17 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
                 .bind(ClientboundPageOpenResponsePacket.class,
                         binder -> binder.handler(ClientboundPageOpenResponsePacketHandler.class, Platform.Type.CLIENT))
                 .bind(ClientboundPageListingsPacket.class,
-                        binder -> binder.handler(ClientboundPageListingsPacketHandler.class, Platform.Type.CLIENT));
+                        binder -> binder.handler(ClientboundPageListingsPacketHandler.class, Platform.Type.CLIENT))
+                .bind(ServerboundPageChangeRequestPacket.class, binder -> binder.handler(ServerboundPageChangeRequestPacketHandler.class, Platform
+                        .Type.SERVER))
+                .bind(ClientboundPageChangeResponsePacket.class, binder -> binder.handler(ClientboundPageChangeResponsePacketHandler.class, Platform
+                        .Type.CLIENT));
 
         this.facet().add(ServerPageManager.class);
         this.requestStaticInjection(GuideCommands.class);
         if (Sponge.getPlatform().getType().isClient()) {
             this.requestStaticInjection(SimplePageView.class);
+            this.requestStaticInjection(SimplePageCreate.class);
         }
     }
 }

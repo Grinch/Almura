@@ -157,6 +157,10 @@ public class SimplePageView extends SimpleScreen {
                 break;
             case "button.save":
                 if (manager.getPage() != null) {
+                    final Page page = manager.getPage();
+                    final String content = this.contentField.getText();
+                    page.setContent(content);
+                    manager.requestSavePage();
 
                 }
             case "button.close":
