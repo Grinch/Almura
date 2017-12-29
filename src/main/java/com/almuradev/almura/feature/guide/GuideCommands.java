@@ -39,6 +39,7 @@ public final class GuideCommands {
                     if (source.hasPermission("almura.guide.refresh")) {
                         try {
                             manager.loadAndSyncPages();
+                            source.sendMessage(Text.of("Pages reloaded"));
                         } catch (IOException e) {
                             throw new CommandException(Text.of("Failed to load pages!"), e);
                         }
