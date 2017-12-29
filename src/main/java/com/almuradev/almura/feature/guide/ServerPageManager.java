@@ -28,8 +28,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
-import org.spongepowered.common.text.SpongeTexts;
-import org.spongepowered.common.text.serializer.LegacyTexts;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

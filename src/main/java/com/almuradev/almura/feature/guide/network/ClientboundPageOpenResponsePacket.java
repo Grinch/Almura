@@ -10,7 +10,6 @@ package com.almuradev.almura.feature.guide.network;
 import com.almuradev.almura.feature.guide.Page;
 import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.Message;
-import org.spongepowered.common.text.serializer.LegacyTexts;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -57,6 +56,6 @@ public final class ClientboundPageOpenResponsePacket implements Message {
         buf.writeString(page.getCreated().toString());
         buf.writeUniqueId(page.getLastModifier());
         buf.writeString(page.getLastModified().toString());
-        buf.writeString(LegacyTexts.replace(page.getContent(), '&', '§'));
+        buf.writeString(Page.asUglyText(page.getContent()));
     }
 }
