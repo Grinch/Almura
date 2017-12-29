@@ -23,8 +23,12 @@ import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPa
 import com.almuradev.almura.feature.guide.network.ServerboundPageChangeRequestPacketHandler;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacket;
 import com.almuradev.almura.feature.guide.network.ServerboundPageOpenRequestPacketHandler;
+import com.almuradev.almura.shared.inject.ClientBinder;
 import com.almuradev.almura.shared.inject.CommonBinder;
 import net.kyori.violet.AbstractModule;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 
@@ -51,9 +55,19 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
 
         this.facet().add(ServerPageManager.class);
         this.requestStaticInjection(GuideCommands.class);
-        if (Sponge.getPlatform().getType().isClient()) {
-            this.requestStaticInjection(SimplePageView.class);
-            this.requestStaticInjection(SimplePageCreate.class);
-        }
+        this.on(Platform.Type.CLIENT, () -> {
+            final class ClientModule extends AbstractModule implements ClientBinder {
+
+                @SideOnly(Side.CLIENT)
+                @Override
+                protected void configure() {
+                    this.requestStaticInjection(SimplePageView.class);
+                    this.requestStaticInjection(SimplePageCreate.class);
+
+                    this.keybinding().key(Keyboard.KEY_G, "key.almura.guide.open", "key.categories.almura.guide");
+                }
+            }
+            this.install(new ClientModule());
+        });
     }
 }
