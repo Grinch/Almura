@@ -53,7 +53,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public final class ServerPageManager extends Witness.Impl implements Activatable, Witness.Lifecycle {
+public final class ServerPageManager extends Witness.Impl implements Witness.Lifecycle {
 
     private final Game game;
     private final Logger logger;
@@ -75,11 +75,6 @@ public final class ServerPageManager extends Witness.Impl implements Activatable
     @Override
     public boolean lifecycleSubscribable(GameState state) {
         return state == GameState.SERVER_STARTING;
-    }
-
-    @Override
-    public boolean active() {
-        return this.game.isServerAvailable();
     }
 
     @Listener
