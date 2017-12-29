@@ -48,7 +48,7 @@ public final class ServerboundGuideOpenRequestPacketHandler implements MessageHa
             }
 
             // Open the GUI
-            this.network.sendTo(player, new ClientboundGuideOpenResponsePacket());
+            this.network.sendTo(player, new ClientboundGuideOpenResponsePacket(player.hasPermission("almura.guide.add")));
 
             final Map<String, Page> pagesToSend = this.manager.getAvailablePagesFor(player);
             if (pagesToSend.size() > 0) {

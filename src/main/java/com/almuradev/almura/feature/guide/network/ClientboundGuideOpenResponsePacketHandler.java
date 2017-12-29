@@ -20,6 +20,7 @@ public final class ClientboundGuideOpenResponsePacketHandler implements MessageH
     @Override
     public void handleMessage(ClientboundGuideOpenResponsePacket message, RemoteConnection connection, Platform.Type side) {
         if (side.isClient()) {
+            // TODO Grinch, the packet will now tell you if you can add new pages, adjust the GUI
             new SimplePageView().display();
         }
     }

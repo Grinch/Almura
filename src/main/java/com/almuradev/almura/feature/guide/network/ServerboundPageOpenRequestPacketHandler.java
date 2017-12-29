@@ -46,7 +46,8 @@ public final class ServerboundPageOpenRequestPacketHandler implements MessageHan
                 this.network.sendTo(player, new ClientboundPageListingsPacket(this.manager.getAvailablePagesFor(player).entrySet().stream().map
                         (entry -> new PageListEntry(entry.getKey(), entry.getValue().getName())).collect(Collectors.toSet())));
             } else {
-                this.network.sendTo(player, new ClientboundPageOpenResponsePacket(page));
+                this.network.sendTo(player, new ClientboundPageOpenResponsePacket(page, player.hasPermission("almura.guide.save." + message.id),
+                        player.hasPermission("almura.guide.meta." + message.id), player.hasPermission("almura.guide.remove." + message.id)));
             }
         }
     }

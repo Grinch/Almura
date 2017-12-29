@@ -30,6 +30,7 @@ public final class ClientboundPageOpenResponsePacketHandler implements MessageHa
     @SideOnly(Side.CLIENT)
     @Override
     public void handleMessage(ClientboundPageOpenResponsePacket message, RemoteConnection connection, Platform.Type side) {
+        // TODO Grinch, the packet now has their capabilities for this page. Update the GUI for it.
         this.manager.setPage(message.page);
 
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {

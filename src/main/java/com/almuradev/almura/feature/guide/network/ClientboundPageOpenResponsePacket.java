@@ -17,16 +17,26 @@ import java.util.UUID;
 public final class ClientboundPageOpenResponsePacket implements Message {
 
     public Page page;
+    public boolean canSave, canViewMeta, canRemove;
 
     public ClientboundPageOpenResponsePacket() {
     }
 
-    public ClientboundPageOpenResponsePacket(Page page) {
+    public ClientboundPageOpenResponsePacket(Page page, boolean canSave, boolean canViewMeta, boolean canRemove) {
         this.page = page;
+        this.canSave = canSave;
+        this.canViewMeta = canViewMeta;
+        this.canRemove = canRemove;
     }
 
     @Override
     public void readFrom(ChannelBuf buf) {
+        // GUI perms for this page
+        this.canSave = buf.readBoolean();
+        this.canViewMeta = buf.readBoolean();
+        this.canRemove = buf.readBoolean();
+
+        // Page information
         final String id = buf.readString();
         final int index = buf.readInteger();
         final String name = buf.readString();
@@ -48,6 +58,12 @@ public final class ClientboundPageOpenResponsePacket implements Message {
 
     @Override
     public void writeTo(ChannelBuf buf) {
+        // GUI perms for this page
+        buf.writeBoolean(this.canSave);
+        buf.writeBoolean(this.canViewMeta);
+        buf.writeBoolean(this.canRemove);
+
+        // Page information
         buf.writeString(page.getId());
         buf.writeInteger(page.getIndex());
         buf.writeString(page.getName());
