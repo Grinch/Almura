@@ -26,8 +26,10 @@ public class UISimpleList<S extends UIContainer<S>> extends UIListContainer<UISi
         super(gui, width, height);
 
         this.showBackground = showBackground;
+
+        // Remove generic scrollbar in favor of slim one
+        this.removeControlComponent(this.scrollbar);
         this.scrollbar = new UISlimScrollbar(gui, self(), UIScrollBar.Type.VERTICAL);
-        this.scrollbar.setAutoHide(true);
     }
 
     public UIScrollBar getScrollBar() {
