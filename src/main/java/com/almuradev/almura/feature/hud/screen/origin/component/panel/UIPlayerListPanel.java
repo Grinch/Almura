@@ -56,7 +56,7 @@ public class UIPlayerListPanel extends AbstractPanel {
     public UIPlayerListPanel(MalisisGui gui, int width, int height) {
         super(gui, width, height);
 
-        this.playerList = new UISimpleList(gui, 0, 0);
+        this.playerList = new UISimpleList(gui, 0, 0, false);
         this.playerList.getScrollBar().setAutoHide(false);
         this.playerList.setElementSpacing(2);
         this.playerList.register(this);

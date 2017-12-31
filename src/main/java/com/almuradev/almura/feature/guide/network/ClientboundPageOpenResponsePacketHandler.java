@@ -33,8 +33,10 @@ public final class ClientboundPageOpenResponsePacketHandler implements MessageHa
         // TODO Grinch, the packet now has their capabilities for this page. Update the GUI for it.
         this.manager.setPage(message.page);
 
-        if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {
-            ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPage();
+        if (side.isClient()) {
+            if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof SimplePageView) {
+                ((SimplePageView) Minecraft.getMinecraft().currentScreen).refreshPage();
+            }
         }
     }
 }

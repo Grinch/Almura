@@ -61,7 +61,7 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
     public void construct() {
         super.construct();
 
-        this.list = new UISimpleList(this, 125, UIComponent.INHERITED);
+        this.list = new UISimpleList(this, 125, UIComponent.INHERITED, false);
         this.list.setPosition(4, 0);
         this.list.setElementSpacing(4);
         this.list.setUnselect(false);

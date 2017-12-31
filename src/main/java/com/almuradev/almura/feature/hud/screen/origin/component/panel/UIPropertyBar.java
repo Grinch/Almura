@@ -47,6 +47,14 @@ public class UIPropertyBar extends UIComponent {
         this.iconShape = new SimpleGuiShape();
     }
 
+    public Text getText() {
+        return this.text;
+    }
+
+    public void setText(Text text) {
+        this.text = text;
+    }
+
     @Override
     public void drawBackground(GuiRenderer renderer, int mouseX, int mouseY, float partialTick) {
         int barWidth = this.width;
@@ -82,14 +90,6 @@ public class UIPropertyBar extends UIComponent {
         final int alpha = MathUtil.squashi(this.getAlpha() - 75, 0, 255);
         renderer.drawRectangle(barX, 1, this.zIndex, barWidth, barHeight, 0, alpha);
         renderer.drawRectangle(barX + 1, 2, this.zIndex, this.getConvertedFill(), barHeight - 2, this.color, this.getAlpha());
-    }
-
-    public Text getText() {
-        return this.text;
-    }
-
-    public void setText(Text text) {
-        this.text = text;
     }
 
     @SuppressWarnings("deprecation")

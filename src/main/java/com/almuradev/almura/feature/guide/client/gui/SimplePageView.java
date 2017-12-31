@@ -11,10 +11,19 @@ import com.almuradev.almura.feature.guide.ClientPageManager;
 import com.almuradev.almura.feature.guide.Page;
 import com.almuradev.almura.feature.guide.PageListEntry;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
+import com.almuradev.almura.shared.client.ui.component.UISimpleList;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
+import net.malisis.core.client.gui.GuiRenderer;
+import net.malisis.core.client.gui.MalisisGui;
+import net.malisis.core.client.gui.component.UIComponent;
+import net.malisis.core.client.gui.component.container.UIBackgroundContainer;
+import net.malisis.core.client.gui.component.container.UIListContainer;
+import net.malisis.core.client.gui.component.decoration.UIImage;
+import net.malisis.core.client.gui.component.decoration.UILabel;
 import net.malisis.core.client.gui.component.interaction.UIButton;
 import net.malisis.core.client.gui.component.interaction.UISelect;
 import net.malisis.core.client.gui.component.interaction.UITextField;
@@ -24,6 +33,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
+
+import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -38,8 +51,10 @@ public class SimplePageView extends SimpleScreen {
     private boolean showRaw = false;
     private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
     private UISelect<PageListEntry> pagesSelect;
+    private UISimpleList list;
     private UITextField contentField;
 
+    @SuppressWarnings({"unchecked"})
     @Override
     public void construct() {
         guiscreenBackground = true;
@@ -127,8 +142,17 @@ public class SimplePageView extends SimpleScreen {
                 .listener(this)
                 .build("button.save");
 
+//        form.add(this.buttonRemove, this.pagesSelect, this.buttonDetails, this.buttonAdd, this.buttonFormat, contentField, buttonClose, buttonSave);
 
-        form.add(this.buttonRemove, this.pagesSelect, this.buttonDetails, this.buttonAdd, this.buttonFormat, contentField, buttonClose, buttonSave);
+        // UISimpleList Test
+        this.list = new UISimpleList(this, 125, SimpleScreen.getPaddedHeight(form), true);
+        this.list.setElements(Lists.newArrayList());
+        this.list.setPosition(4, 0);
+        this.list.setElementSpacing(4);
+        this.list.setUnselect(false);
+        this.list.register(this);
+
+        form.add(this.list);
 
         addToScreen(form);
 
@@ -188,10 +212,27 @@ public class SimplePageView extends SimpleScreen {
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public void refreshPageEntries() {
-        pagesSelect.setOptions(manager.getPageEntries());
-        // TODO Grinch, if you get a page refresh, might wanna check if their current page is still in the list and keep them selected on it
-        pagesSelect.selectFirst();
+        final List<PageListElement> elementList = Lists.newArrayList();
+        manager.getPageEntries()
+                .forEach(entry -> elementList.add(new PageListElement(this, this.list, Text.of(entry.getName()), Text.EMPTY)));
+        this.list.setElements(elementList);
+//        pagesSelect.setOptions(manager.getPageEntries());
+//
+//        if (pagesSelect.getSelectedValue() != null) {
+//            final Optional<PageListEntry> result = manager.getPageEntries().stream()
+//                    .filter(entry -> entry.getId().equalsIgnoreCase(pagesSelect.getSelectedValue().getId()))
+//                    .findFirst();
+//
+//            if (result.isPresent()) {
+//                pagesSelect.setSelectedOption(result.get());
+//            } else {
+//                pagesSelect.selectFirst();
+//            }
+//        } else {
+//            pagesSelect.selectFirst();
+//        }
     }
 
     public void refreshPage() {
@@ -227,5 +268,68 @@ public class SimplePageView extends SimpleScreen {
     private void updateFormattingButton() {
         this.buttonFormat.setText(this.showRaw ? "Raw" : TextFormatting.ITALIC + "Formatted");
         this.buttonFormat.setTooltip(this.showRaw ? "Showing raw text" : "Showing formatted text");
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return true;
+    }
+
+    protected static final class PageListElement extends UIBackgroundContainer {
+
+        private static final int BORDER_COLOR = org.spongepowered.api.util.Color.ofRgb(128, 128, 128).getRgb();
+        private static final int INNER_COLOR = org.spongepowered.api.util.Color.ofRgb(0, 0, 0).getRgb();
+
+        private final Text contentText;
+        private final UILabel label;
+
+        private PageListElement(MalisisGui gui, UISimpleList parent, Text text, Text contentText) {
+            this(gui, parent, 32, 32, 2, 0, 4, text, contentText);
+        }
+
+        @SuppressWarnings("deprecation")
+        private PageListElement(MalisisGui gui, UISimpleList parent, int imageWidth, int imageHeight, int imageX, int imageY, int
+                padding, Text text, Text contentText) {
+            super(gui);
+
+            // Set parent
+            this.parent = parent;
+
+            // Create label
+            this.label = new UILabel(gui, TextSerializers.LEGACY_FORMATTING_CODE.serialize(text));
+            this.label.setPosition(padding, 2);
+
+            // Set content text
+            this.contentText = contentText;
+
+            // Add image/label
+//            this.add(this.image, this.label);
+            this.add(this.label);
+
+            // Set size
+            this.setSize(((UIListContainer) this.getParent()).getContentWidth() - 3, 24);
+
+            // Set padding
+            this.setPadding(1, 1);
+
+            // Set colors
+            this.setColor(INNER_COLOR);
+            this.setBorder(BORDER_COLOR, 1, 255);
+        }
+
+        @Override
+        public void drawBackground(GuiRenderer renderer, int mouseX, int mouseY, float partialTick) {
+            if (this.parent instanceof UISimpleList) {
+                final UISimpleList parent = (UISimpleList) this.parent;
+
+                final int width = parent.getContentWidth() - (parent.getScrollBar().isEnabled() ? parent.getScrollBar().getRawWidth() + 1 : 0);
+
+                setSize(width, getHeight());
+
+                if (this == parent.getSelected()) {
+                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
+                }
+            }
+        }
     }
 }

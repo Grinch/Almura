@@ -61,6 +61,7 @@ public final class GuideModule extends AbstractModule implements CommonBinder {
                 @SideOnly(Side.CLIENT)
                 @Override
                 protected void configure() {
+                    this.facet().add(ClientPageManager.class);
                     this.requestStaticInjection(SimplePageView.class);
                     this.requestStaticInjection(SimplePageCreate.class);
 

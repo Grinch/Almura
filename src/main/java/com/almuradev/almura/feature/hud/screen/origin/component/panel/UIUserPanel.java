@@ -122,7 +122,8 @@ public class UIUserPanel extends AbstractPanel {
         this.airBar = new UIPropertyBar(gui, barWidth, barHeight)
                 .setPosition(0, SimpleScreen.getPaddedY(this.staminaBar, 1), Anchor.TOP | Anchor.CENTER)
                 .setColor(org.spongepowered.api.util.Color.ofRgb(0, 148, 255).getRgb())
-                .setBackgroundIcon(GuiConfig.Icon.VANILLA_AIR);
+                .setBackgroundIcon(GuiConfig.Icon.VANILLA_AIR)
+                .setSpritesheet(GuiConfig.SpriteSheet.ALMURA);
 
         // Mount Health
         this.mountHealthBar = new UIPropertyBar(gui, barWidth, barHeight)
