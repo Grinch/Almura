@@ -9,13 +9,13 @@ package com.almuradev.almura.feature.hud.screen.origin.component.panel;
 
 import com.almuradev.almura.feature.hud.screen.origin.UIAvatarImage;
 import com.almuradev.almura.feature.nick.ClientNickManager;
-import com.almuradev.almura.shared.client.ui.component.UISimpleList;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleList;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleListElement;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import net.malisis.core.client.gui.GuiRenderer;
 import net.malisis.core.client.gui.MalisisGui;
-import net.malisis.core.client.gui.component.container.UIBackgroundContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -25,7 +25,6 @@ import net.minecraft.world.GameType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.common.text.SpongeTexts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -56,7 +55,7 @@ public class UIPlayerListPanel extends AbstractPanel {
     public UIPlayerListPanel(MalisisGui gui, int width, int height) {
         super(gui, width, height);
 
-        this.playerList = new UISimpleList(gui, 0, 0, false);
+        this.playerList = new UISimpleList(gui, 0, 0);
         this.playerList.getScrollBar().setAutoHide(false);
         this.playerList.setElementSpacing(2);
         this.playerList.register(this);
@@ -84,18 +83,13 @@ public class UIPlayerListPanel extends AbstractPanel {
         // Get maximum column width
         final int maxColumnWidth = this.getMaxColumnWidth(entries);
 
-        final List<PlayerListElement> elementList = new ArrayList<>();
         for (int i = 0; i < entries.size(); i += 2) {
             final NetworkPlayerInfo player1 = entries.get(i);
             final NetworkPlayerInfo player2 = i + 1 < entries.size() ? entries.get(i + 1) : null;
 
             // Add a new element tot he list
-            elementList.add(new PlayerListElement(this.getGui(), this.playerList, player1, player2,
-                    maxColumnWidth));
+            this.playerList.addElements(new PlayerListElement(this.getGui(), this.playerList, player1, player2, maxColumnWidth));
         }
-
-        // Set elements
-        this.playerList.setElements(elementList);
 
         // Auto size our height
         this.height = Math.min(this.playerList.getContentHeight() + 5, MAX_HEIGHT);
@@ -150,7 +144,7 @@ public class UIPlayerListPanel extends AbstractPanel {
         return ScorePlayerTeam.formatPlayerName(player.getPlayerTeam(), player.getGameProfile().getName());
     }
 
-    protected static final class PlayerListElement extends UIBackgroundContainer {
+    protected static final class PlayerListElement extends UISimpleListElement {
 
         private static final int BORDER_COLOR = org.spongepowered.api.util.Color.ofRgb(128, 128, 128).getRgb();
         private static final int ICON_SIZE = 12;
@@ -162,8 +156,7 @@ public class UIPlayerListPanel extends AbstractPanel {
 
         @SuppressWarnings("deprecation")
         private PlayerListElement(MalisisGui gui, UISimpleList parent, NetworkPlayerInfo player1, @Nullable NetworkPlayerInfo player2, int maxColumnWidth) {
-            super(gui);
-            this.parent = parent;
+            super(gui, parent);
             this.maxColumnWidth = maxColumnWidth;
 
             this.player1 = player1;

@@ -11,32 +11,33 @@ import com.almuradev.almura.feature.guide.ClientPageManager;
 import com.almuradev.almura.feature.guide.Page;
 import com.almuradev.almura.feature.guide.PageListEntry;
 import com.almuradev.almura.shared.client.ui.component.UIForm;
-import com.almuradev.almura.shared.client.ui.component.UISimpleList;
-import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.almura.shared.client.ui.component.button.UISimpleButton;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleListElement;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleList;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
-import com.google.common.collect.Lists;
+import com.flowpowered.math.vector.Vector2i;
 import com.google.common.eventbus.Subscribe;
 import net.malisis.core.client.gui.Anchor;
 import net.malisis.core.client.gui.GuiRenderer;
 import net.malisis.core.client.gui.MalisisGui;
-import net.malisis.core.client.gui.component.UIComponent;
 import net.malisis.core.client.gui.component.container.UIBackgroundContainer;
 import net.malisis.core.client.gui.component.container.UIListContainer;
 import net.malisis.core.client.gui.component.decoration.UIImage;
 import net.malisis.core.client.gui.component.decoration.UILabel;
 import net.malisis.core.client.gui.component.interaction.UIButton;
-import net.malisis.core.client.gui.component.interaction.UISelect;
 import net.malisis.core.client.gui.component.interaction.UITextField;
+import net.malisis.core.renderer.font.FontOptions;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.util.Color;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -44,13 +45,13 @@ import javax.inject.Inject;
 public class SimplePageView extends SimpleScreen {
 
     private static final int INNER_PADDING = 2;
+    private static final int ADD_COLOR = Color.ofRgb(115, 115, 115).getRgb();
 
     @Inject
     private static ClientPageManager manager;
 
     private boolean showRaw = false;
-    private UIButton buttonRemove, buttonAdd, buttonDetails, buttonFormat;
-    private UISelect<PageListEntry> pagesSelect;
+    private UIButton buttonFormat, buttonSave;
     private UISimpleList list;
     private UITextField contentField;
 
@@ -59,113 +60,38 @@ public class SimplePageView extends SimpleScreen {
     public void construct() {
         guiscreenBackground = true;
 
-        final UIForm form = new UIForm(this, 250, 225, I18n.format("almura.guide.view.form.title"));
+        final UIForm form = new UIForm(this, 300, 225, I18n.format("almura.guide.view.form.title"));
         form.setAnchor(Anchor.CENTER | Anchor.MIDDLE);
         form.setMovable(true);
         form.setClosable(true);
-        form.setClipContent(false);
+        form.setClipContent(true);
 
-        // Remove button
-        this.buttonRemove = new UIButtonBuilder(this)
-                .width(10)
-                .text(Text.of(TextColors.RED, "-"))
-                .tooltip(Text.of("almura.guide.view.remove"))
-                .visible(hasAnyPermission())
-                .enabled(hasRemovePermission())
-                .listener(this)
-                .build("button.remove");
-
-        // Details button
-        this.buttonDetails = new UIButtonBuilder(this)
-                .width(10)
-                .text(Text.of(TextColors.YELLOW, "?"))
-                .tooltip(Text.of(I18n.format("almura.guide.view.details")))
-                .anchor(Anchor.TOP | Anchor.RIGHT)
-                .visible(hasAnyPermission())
-                .listener(this)
-                .build("button.help");
-
-        // Add button
-        this.buttonAdd = new UIButtonBuilder(this)
-                .width(10)
-                .x(SimpleScreen.getPaddedX(this.buttonDetails, 2, Anchor.RIGHT))
-                .text(Text.of(TextColors.GREEN, "+"))
-                .tooltip(Text.of("almura.guide.view.add"))
-                .anchor(Anchor.TOP | Anchor.RIGHT)
-                .visible(hasAnyPermission())
-                .enabled(hasAddPermission())
-                .listener(this)
-                .build("button.add");
-
-        // Pages dropdown
-        this.pagesSelect = new UISelect<>(this, SimpleScreen.getPaddedWidth(form));
-        this.pagesSelect.setLabelFunction(PageListEntry::getName);
-        this.pagesSelect.setName("combobox.pages");
-        this.pagesSelect.setPosition(this.buttonRemove.isVisible() ? SimpleScreen.getPaddedX(this.buttonRemove, INNER_PADDING) : 0, 0);
-        this.pagesSelect.register(this);
-        if (hasAnyPermission()) {
-            this.pagesSelect.setSize(this.pagesSelect.getWidth() - this.buttonDetails.getWidth() - this.buttonAdd.getWidth() - this.buttonRemove
-                    .getWidth() - (INNER_PADDING * 4) + 2, 15);
-        }
-
-        // Formatted button
-        this.buttonFormat = new UIButtonBuilder(this)
-                .width(10)
-                .anchor(Anchor.BOTTOM | Anchor.LEFT)
-                .visible(this.hasAnyPermission())
-                .listener(this)
-                .build("button.format");
-
-        // Content text field
-        contentField = new UITextField(this, "", true);
-        contentField.setSize(SimpleScreen.getPaddedWidth(form),
-                SimpleScreen.getPaddedHeight(form) - this.pagesSelect.getHeight() - (INNER_PADDING * 2) - this.buttonFormat.getHeight());
-        contentField.setPosition(0, SimpleScreen.getPaddedY(this.pagesSelect, INNER_PADDING));
-        contentField.setEditable(true);
-
-        // Close button
-        final UIButton buttonClose = new UIButtonBuilder(this)
-                .width(40)
-                .anchor(Anchor.BOTTOM | Anchor.RIGHT)
-                .text(Text.of("almura.guide.button.close"))
-                .listener(this)
-                .build("button.close");
-
-        // Save button
-        final UIButton buttonSave = new UIButtonBuilder(this)
-                .width(40)
-                .anchor(Anchor.BOTTOM | Anchor.RIGHT)
-                .x(SimpleScreen.getPaddedX(buttonClose, INNER_PADDING, Anchor.RIGHT))
-                .text(Text.of("almura.guide.button.save"))
-                .visible(hasAnyPermission())
-                .enabled(hasEditPermission())
-                .listener(this)
-                .build("button.save");
-
-//        form.add(this.buttonRemove, this.pagesSelect, this.buttonDetails, this.buttonAdd, this.buttonFormat, contentField, buttonClose, buttonSave);
+        final int paddedHeight = SimpleScreen.getPaddedHeight(form);
 
         // UISimpleList Test
-        this.list = new UISimpleList(this, 125, SimpleScreen.getPaddedHeight(form), true);
-        this.list.setElements(Lists.newArrayList());
-        this.list.setPosition(4, 0);
-        this.list.setElementSpacing(4);
-        this.list.setUnselect(false);
+        this.list = new UISimpleList(this, 125, paddedHeight - 50);
+        this.list.setPosition(0, 0);
+        this.list.setPadding(1, 1);
+//        this.list.setUnselect(false);
         this.list.register(this);
 
-        form.add(this.list);
+        // Content text field
+        this.contentField = new UITextField(this, "", true);
+        this.contentField.setSize(SimpleScreen.getPaddedWidth(form) - this.list.getWidth() - INNER_PADDING, paddedHeight - 17);
+        this.contentField.setPosition(SimpleScreen.getPaddedX(this.list, INNER_PADDING), 0);
+        this.contentField.setEditable(false);
+        this.contentField.getScrollbar().setAutoHide(true);
+
+        form.add(this.list, this.contentField);
 
         addToScreen(form);
-
-        this.updateButtons();
     }
 
     @Subscribe
     public void onUIButtonClickEvent(UIButton.ClickEvent event) {
         switch (event.getComponent().getName().toLowerCase()) {
-            case "button.details":
             case "button.format":
                 this.showRaw = !this.showRaw;
-                this.updateFormattingButton();
 
                 final String currentContent = this.contentField.getText();
                 if (showRaw) {
@@ -176,20 +102,12 @@ public class SimplePageView extends SimpleScreen {
                     this.contentField.setText(Page.asUglyText(currentContent));
                 }
                 break;
-            case "button.add":
-                new SimplePageCreate(this).display();
-                break;
             case "button.save":
                 if (manager.getPage() != null) {
                     final Page page = manager.getPage();
                     final String content = this.contentField.getText();
                     page.setContent(content);
                     manager.requestSavePage();
-                }
-                break;
-            case "button.remove":
-                if (manager.getPage() != null) {
-                    manager.requestRemovePage(manager.getPage().getId());
                 }
                 break;
             case "button.close":
@@ -199,39 +117,47 @@ public class SimplePageView extends SimpleScreen {
     }
 
     @Subscribe
-    public void onComboBoxSelect(UISelect.SelectEvent event) {
-        switch (event.getComponent().getName().toLowerCase()) {
-            case "combobox.pages": {
-                if (event.getNewValue() == null) {
-                    this.contentField.setText("");
-                } else {
-                    final PageListEntry entry = (PageListEntry) event.getNewValue();
-                    manager.requestPage(entry.getId());
-                }
+    public void onElementSelect(UIListContainer.SelectEvent event) {
+        if (event.getNewValue() == null) {
+            this.contentField.setText("");
+        } else {
+            final ListElement element = (ListElement) event.getNewValue();
+            if (element instanceof PageListElement){
+                manager.requestPage(((PageListElement) event.getNewValue()).getTag().getId());
+            } else if (element.getName().equalsIgnoreCase("element.add")) {
+                new SimplePageCreate(this).display();
             }
         }
     }
 
     @SuppressWarnings({"unchecked"})
     public void refreshPageEntries() {
-        final List<PageListElement> elementList = Lists.newArrayList();
-        manager.getPageEntries()
-                .forEach(entry -> elementList.add(new PageListElement(this, this.list, Text.of(entry.getName()), Text.EMPTY)));
-        this.list.setElements(elementList);
-//        pagesSelect.setOptions(manager.getPageEntries());
-//
-//        if (pagesSelect.getSelectedValue() != null) {
-//            final Optional<PageListEntry> result = manager.getPageEntries().stream()
-//                    .filter(entry -> entry.getId().equalsIgnoreCase(pagesSelect.getSelectedValue().getId()))
-//                    .findFirst();
-//
-//            if (result.isPresent()) {
-//                pagesSelect.setSelectedOption(result.get());
-//            } else {
-//                pagesSelect.selectFirst();
+        // Create elements for every page entry available
+//        manager.getPageEntries().forEach(entry -> elementList.add(new PageListElement(this, this.list, entry, ItemTypes.BARRIER)));
+        this.list.addElements(manager.getPageEntries().stream()
+                .map(entry -> new UISimpleListElement<PageListEntry>(this, this.list))
+                .collect(Collectors.toList()));
+
+        // Create 'add' list element
+//        final ListElement addElement = new ListElement(this, this.list, "+", null, false, false, false, false);
+//        addElement.setContentFontOptions(FontOptions.builder().color(ADD_COLOR).scale(2f).build());
+//        addElement.setContentPosition(2, 2, Anchor.MIDDLE | Anchor.CENTER);
+//        addElement.setName("element.add");
+
+        // Add 'add' element to list
+//        elementList.add(addElement);
+
+        // Set list elements to use list of elements
+//        this.list.setElements(elementList);
+
+        // Get the first available element and select it if it is a page element
+        boolean hasSelected = false;
+//        for (ListElement element : (Iterable<ListElement>) this.list.getElements()) {
+//            if (!hasSelected) {
+//                hasSelected = true;
+//                this.list.select(element);
 //            }
-//        } else {
-//            pagesSelect.selectFirst();
+//            element.updateContent();
 //        }
     }
 
@@ -239,7 +165,18 @@ public class SimplePageView extends SimpleScreen {
         if (manager.getPage() != null) {
             this.contentField.setText(manager.getPage().getContent());
         }
-        this.updateButtons();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void selectPage(String id) {
+//        for (ListElement currentElement : (Iterable<ListElement>) this.list.getElements()) {
+//            if (currentElement instanceof PageListElement) {
+//                final PageListElement currentPageElement = (PageListElement) currentElement;
+//                if (currentPageElement.getTag().getId().equalsIgnoreCase(id)) {
+//                    this.list.select(currentPageElement);
+//                }
+//            }
+//        }
     }
 
     private boolean hasAnyPermission() {
@@ -258,78 +195,203 @@ public class SimplePageView extends SimpleScreen {
         return true;
     }
 
-    private void updateButtons() {
-        this.updateFormattingButton();
-        this.buttonFormat.setEnabled((this.hasAnyPermission() && manager.getPage() != null));
-        this.buttonRemove.setEnabled((this.hasRemovePermission() && manager.getPage() != null));
-        this.buttonDetails.setEnabled((this.hasAnyPermission() && manager.getPage() != null));
-    }
-
-    private void updateFormattingButton() {
-        this.buttonFormat.setText(this.showRaw ? "Raw" : TextFormatting.ITALIC + "Formatted");
-        this.buttonFormat.setTooltip(this.showRaw ? "Showing raw text" : "Showing formatted text");
-    }
-
     @Override
     public boolean doesGuiPauseGame() {
         return true;
     }
 
-    protected static final class PageListElement extends UIBackgroundContainer {
+    protected static class ListElement<T> extends UIBackgroundContainer {
 
-        private static final int BORDER_COLOR = org.spongepowered.api.util.Color.ofRgb(128, 128, 128).getRgb();
-        private static final int INNER_COLOR = org.spongepowered.api.util.Color.ofRgb(0, 0, 0).getRgb();
+        private static final int INNER_COLOR = org.spongepowered.api.util.Color.ofRgb(128, 128, 128).getRgb();
 
-        private final Text contentText;
-        private final UILabel label;
+        private final boolean showHighlight, canSelect, canDelete, hasMeta;
+        private final UISimpleButton deleteButton, metaButton;
+        private final UILabel contentLabel;
+        protected final T tag;
+        private UIImage image;
+        protected String content;
 
-        private PageListElement(MalisisGui gui, UISimpleList parent, Text text, Text contentText) {
-            this(gui, parent, 32, 32, 2, 0, 4, text, contentText);
+        private ListElement(MalisisGui gui, UISimpleList parent, String content, T tag, boolean showHighlight, boolean canSelect, boolean canDelete,
+                boolean hasMeta) {
+            this(gui, parent, content, tag, ItemTypes.AIR, showHighlight, canSelect, canDelete, hasMeta);
         }
 
-        @SuppressWarnings("deprecation")
-        private PageListElement(MalisisGui gui, UISimpleList parent, int imageWidth, int imageHeight, int imageX, int imageY, int
-                padding, Text text, Text contentText) {
+        private ListElement(MalisisGui gui, UISimpleList parent, String content, T tag, ItemType itemType, boolean showHighlight, boolean canSelect,
+                boolean canDelete, boolean hasMeta) {
             super(gui);
 
             // Set parent
-            this.parent = parent;
+            setParent(parent);
 
-            // Create label
-            this.label = new UILabel(gui, TextSerializers.LEGACY_FORMATTING_CODE.serialize(text));
-            this.label.setPosition(padding, 2);
+            // Set tag
+            this.tag = tag;
 
-            // Set content text
-            this.contentText = contentText;
+            // Set content
+            this.content = content;
 
-            // Add image/label
-//            this.add(this.image, this.label);
-            this.add(this.label);
+            this.showHighlight = showHighlight;
+            this.canSelect = canSelect;
+            this.canDelete = canDelete;
+            this.hasMeta = hasMeta;
+
+            // Create/add content label
+            this.contentLabel = new UILabel(gui, this.content);
+            this.contentLabel.setFontOptions(FontOptions.builder()
+                    .from(this.contentLabel.getFontOptions())
+                    .color(TextColors.WHITE.getColor().getRgb())
+                    .shadow(true)
+                    .build());
+            this.contentLabel.setAnchor(Anchor.MIDDLE | Anchor.LEFT);
+            this.contentLabel.setPosition(2, 0);
+            this.add(this.contentLabel);
+
+            // Create/add image
+            if (itemType != ItemTypes.AIR) {
+                this.image = new UIImage(gui, (net.minecraft.item.ItemStack) (Object) ItemStack.of(itemType, 1));
+                this.image.setPosition(2, 2);
+                this.add(this.image);
+
+                // Move label
+                this.contentLabel.setPosition(this.image.getWidth() + 4, 0);
+            }
+
+            // Create/add 'x' (delete) button
+            this.deleteButton = new UISimpleButton(gui, "x");
+            this.deleteButton.setFontOptions(new FontOptions.FontOptionsBuilder().from(this.deleteButton.getFontOptions()).color(TextColors.RED
+                    .getColor().getRgb()).build());
+            this.deleteButton.setAutoSize(false);
+            this.deleteButton.setSize(8, 8);
+            this.deleteButton.setPosition(2, 0, Anchor.TOP | Anchor.RIGHT);
+            this.deleteButton.setTooltip(I18n.format("almura.guide.view.delete"));
+            this.deleteButton.register(this);
+            this.deleteButton.setName("button.delete");
+
+            // Create/add '?' (meta) button
+            this.metaButton = new UISimpleButton(gui, "?");
+            this.metaButton.setFontOptions(new FontOptions.FontOptionsBuilder().from(this.metaButton.getFontOptions()).color(TextColors.YELLOW
+                    .getColor().getRgb()).build());
+            this.metaButton.setAutoSize(false);
+            this.metaButton.setSize(8, 6);
+            this.metaButton.setPosition(2, 0, Anchor.BOTTOM | Anchor.RIGHT);
+            this.metaButton.setTooltip(I18n.format("almura.guide.view.meta"));
+            this.metaButton.register(this);
+            this.metaButton.setName("button.meta");
+
+            this.add(this.deleteButton, this.metaButton);
 
             // Set size
-            this.setSize(((UIListContainer) this.getParent()).getContentWidth() - 3, 24);
+            this.setSize(this.getWidth(), 22);
 
             // Set padding
             this.setPadding(1, 1);
 
-            // Set colors
-            this.setColor(INNER_COLOR);
-            this.setBorder(BORDER_COLOR, 1, 255);
+            this.updateContent();
+        }
+
+        public T getTag() {
+            return this.tag;
+        }
+
+        public FontOptions getContentFontOptions() {
+            return this.contentLabel.getFontOptions();
+        }
+
+        public void setContentFontOptions(FontOptions options) {
+            this.contentLabel.setFontOptions(options);
+        }
+
+        public int getContentAnchor() {
+            return this.contentLabel.getAnchor();
+        }
+
+        public void setContentAnchor(int anchor) {
+            this.contentLabel.setAnchor(anchor);
+        }
+
+        public Vector2i getContentPosition() {
+            return new Vector2i(this.contentLabel.getX(), this.contentLabel.getY());
+        }
+
+        public void setContentPosition(int x, int y) {
+            this.contentLabel.setPosition(x, y);
+        }
+
+        public void setContentPosition(int x, int y, int anchor) {
+            this.contentLabel.setPosition(x, y, anchor);
+        }
+
+        private void updateButtons(boolean isHovered) {
+            this.deleteButton.setVisible(isHovered && this.canDelete);
+            this.metaButton.setVisible(isHovered && this.hasMeta);
+        }
+
+        private void updateContent() {
+            final int maxDisplayWidth = ((UISimpleList) parent).getContentWidth() - (this.image == null ? 4 : this.image.getWidth() + 4) - this.metaButton.getWidth();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < content.length(); i++) {
+                final char currentChar = content.charAt(i);
+                final String currentChars = builder.toString();
+
+                if (Minecraft.getMinecraft().fontRenderer.getStringWidth(currentChars + currentChar) > maxDisplayWidth) {
+                    builder = new StringBuilder(currentChars.substring(0, currentChars.length() - 2) + "...");
+                    break;
+                }
+                builder.append(currentChar);
+            }
+
+            if (!builder.toString().equals(content)) {
+                this.contentLabel.setText(builder.toString());
+                this.contentLabel.setTooltip(content);
+            }
+        }
+
+        @Override
+        public boolean onClick(int mouseX, int mouseY) {
+            return canSelect;
         }
 
         @Override
         public void drawBackground(GuiRenderer renderer, int mouseX, int mouseY, float partialTick) {
-            if (this.parent instanceof UISimpleList) {
-                final UISimpleList parent = (UISimpleList) this.parent;
+            final UISimpleList simpleParent = (UISimpleList) parent;
 
-                final int width = parent.getContentWidth() - (parent.getScrollBar().isEnabled() ? parent.getScrollBar().getRawWidth() + 1 : 0);
+            setSize(simpleParent.getContentWidth(), getHeight());
 
-                setSize(width, getHeight());
+            if (this.parent != null) {
+//                if (this == simpleParent.getSelected()) {
+//                    renderer.drawRectangle(simpleParent.getLeftPadding(), simpleParent.getTopPadding(), 0, this.width, this.height, INNER_COLOR,
+//                            255);
+//                }
 
-                if (this == parent.getSelected()) {
-                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
+                final boolean isHovered = isInsideBounds(mouseX, mouseY);
+                if (isHovered && this.showHighlight) {
+                    renderer.drawRectangle(simpleParent.getLeftPadding(), simpleParent.getTopPadding(), 0, this.width, this.height, INNER_COLOR,
+                            100);
                 }
+                this.updateButtons(isHovered);
             }
+        }
+
+        @Subscribe
+        public void onUIButtonClickEvent(UIButton.ClickEvent event) {
+            switch (event.getComponent().getName().toLowerCase()) {
+                case "button.details":
+                case "button.remove":
+                    if (manager.getPage() != null) {
+                        manager.requestRemovePage(manager.getPage().getId());
+                    }
+                    break;
+            }
+        }
+    }
+
+    private final static class PageListElement extends ListElement<PageListEntry> {
+
+        private PageListElement(MalisisGui gui, UISimpleList parent, PageListEntry entry) {
+            super(gui, parent, entry.getName(), entry, true, true, true, true);
+        }
+
+        private PageListElement(MalisisGui gui, UISimpleList parent, PageListEntry entry, ItemType itemType) {
+            super(gui, parent, entry.getName(), entry, itemType, true, true, true, true);
         }
     }
 }

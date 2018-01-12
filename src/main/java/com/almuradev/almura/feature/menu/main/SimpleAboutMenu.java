@@ -11,8 +11,9 @@ import com.almuradev.almura.Almura;
 import com.almuradev.almura.shared.client.GuiConfig;
 import com.almuradev.almura.shared.client.texture.GuiRemoteTexture;
 import com.almuradev.almura.shared.client.ui.FontColors;
-import com.almuradev.almura.shared.client.ui.component.UISimpleList;
 import com.almuradev.almura.shared.client.ui.component.button.UIButtonBuilder;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleList;
+import com.almuradev.almura.shared.client.ui.component.list.UISimpleListElement;
 import com.almuradev.almura.shared.client.ui.screen.SimpleContainerScreen;
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
 import com.google.common.collect.Lists;
@@ -61,14 +62,13 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
     public void construct() {
         super.construct();
 
-        this.list = new UISimpleList(this, 125, UIComponent.INHERITED, false);
+        this.list = new UISimpleList(this, 125, UIComponent.INHERITED);
         this.list.setPosition(4, 0);
         this.list.setElementSpacing(4);
-        this.list.setUnselect(false);
+//        this.list.setUnselect(false);
 
-        final List<AboutListElement> elementList = Lists.newArrayList();
         // Static entry
-        elementList.add(new AboutListElement(
+        this.list.addElements(new AboutListElement(
                 this,
                 this.list,
                 new UIImage(this, new GuiTexture(GuiConfig.Location.ALMURA_MAN), null), 23, 32, 5, 0, 8,
@@ -80,7 +80,7 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
             for (String title : entry.titles) {
                 titles = titles.toBuilder().append(Text.of("  • ", I18n.format(title)), Text.NEW_LINE).build();
             }
-            elementList.add(new AboutListElement(
+            this.list.addElements(new AboutListElement(
                     this,
                     this.list,
                     new UIImage(this, new GuiRemoteTexture(
@@ -108,9 +108,8 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
         this.textField.setEditable(false);
         this.textField.setFontOptions(FontOptions.builder().from(FontColors.WHITE_FO).shadow(false).build());
 
-        this.list.setElements(elementList);
         this.list.register(this);
-        this.list.select(elementList.get(0));
+//        this.list.select(elementList.get(0));
 
         this.getContainer().add(this.list, this.textField);
 
@@ -159,10 +158,11 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
             final AboutListElement element = (AboutListElement) event.getSelected();
 
             this.textField.setText(TextSerializers.LEGACY_FORMATTING_CODE.serialize(element.contentText));
+            this.textField.setCursorPosition(0, 0);
         }
     }
 
-    protected static final class AboutListElement extends UIBackgroundContainer {
+    protected static final class AboutListElement extends UISimpleListElement {
 
         private static final int BORDER_COLOR = org.spongepowered.api.util.Color.ofRgb(128, 128, 128).getRgb();
         private static final int INNER_COLOR = org.spongepowered.api.util.Color.ofRgb(0, 0, 0).getRgb();
@@ -178,10 +178,7 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
         @SuppressWarnings("deprecation")
         private AboutListElement(MalisisGui gui, UISimpleList parent, UIImage image, int imageWidth, int imageHeight, int imageX, int imageY, int
                 padding, Text text, Text contentText) {
-            super(gui);
-
-            // Set parent
-            this.parent = parent;
+            super(gui, parent);
 
             // Create image
             this.image = image;
@@ -199,7 +196,7 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
             this.add(this.image, this.label);
 
             // Set size
-            this.setSize(((UIListContainer) this.getParent()).getContentWidth() - 3, image.getHeight() + 6);
+            this.setSize(((UISimpleList) this.getParent()).getContentWidth() - 3, image.getHeight() + 6);
 
             // Set padding
             this.setPadding(1, 1);
@@ -218,9 +215,9 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
 
                 setSize(width, getHeight());
 
-                if (this == parent.getSelected()) {
-                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
-                }
+//                if (this == parent.getSelected()) {
+//                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
+//                }
             }
         }
     }

@@ -103,6 +103,9 @@ public final class ServerboundPageChangeRequestPacketHandler implements MessageH
             this.game.getServer().getOnlinePlayers().forEach((online) -> this.network.sendTo(online, new ClientboundPageListingsPacket(this.manager
                     .getAvailablePagesFor(online).entrySet().stream().map(entry -> new PageListEntry(entry.getKey(), entry.getValue().getName()))
                     .collect(Collectors.toSet()))));
+
+            this.network.sendTo(player, new ClientboundPageChangeResponsePacket(message.changeType, true, message.id, "almura.guide." + message
+                    .changeType.name().toLowerCase() + ".message.success"));
         }
     }
 }
