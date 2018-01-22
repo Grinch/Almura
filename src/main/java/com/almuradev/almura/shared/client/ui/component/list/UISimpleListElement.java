@@ -1,3 +1,10 @@
+/*
+ * This file is part of Almura.
+ *
+ * Copyright (c) AlmuraDev <https://github.com/AlmuraDev/>
+ *
+ * All Rights Reserved.
+ */
 package com.almuradev.almura.shared.client.ui.component.list;
 
 import net.malisis.core.client.gui.MalisisGui;
@@ -20,15 +27,11 @@ public class UISimpleListElement<T> extends UIBackgroundContainer {
     public UISimpleListElement(MalisisGui gui, UISimpleList parent, int height) {
         super(gui);
         this.parent = parent;
-        this.setElementHeight(height);
+        this.setHeight(height);
         this.applyDefaults();
     }
 
-    public int getElementHeight() {
-        return this.elementHeight;
-    }
-
-    public UISimpleListElement<T> setElementHeight(int elementHeight) {
+    public final UISimpleListElement<T> setHeight(int elementHeight) {
         this.elementHeight = elementHeight;
         super.setSize(((UISimpleList) this.parent).getContentWidth(), this.elementHeight);
         return this;
@@ -38,7 +41,7 @@ public class UISimpleListElement<T> extends UIBackgroundContainer {
         return this.isSelected;
     }
 
-    public UISimpleListElement<T> setSelected(boolean isSelected) {
+    protected UISimpleListElement<T> setSelected(boolean isSelected) {
         this.isSelected = isSelected;
         return this;
     }
@@ -53,8 +56,8 @@ public class UISimpleListElement<T> extends UIBackgroundContainer {
     }
 
     @Override
-    public UISimpleListElement<T> setSize(int width, int height) {
-        this.setElementHeight(height);
+    public final UISimpleListElement<T> setSize(int width, int height) {
+        this.setHeight(height);
         return this;
     }
 

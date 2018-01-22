@@ -1,3 +1,10 @@
+/*
+ * This file is part of Almura.
+ *
+ * Copyright (c) AlmuraDev <https://github.com/AlmuraDev/>
+ *
+ * All Rights Reserved.
+ */
 package com.almuradev.almura.shared.client.ui.component.list;
 
 import com.almuradev.almura.shared.client.ui.screen.SimpleScreen;
@@ -27,8 +34,8 @@ import java.util.stream.Collectors;
 @SideOnly(Side.CLIENT)
 public class UISimpleList extends UIComponent<UISimpleList> implements IScrollable, IClipable {
 
+    private boolean multiselect;
     private int bottomPadding, leftPadding, rightPadding, topPadding;
-    private int contentWidth, contentHeight = 0;
     private int elementSpacing = 1;
     private int lastSize;
     private int xOffset, yOffset;
@@ -53,6 +60,15 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
 
     public UISimpleList setScrollBar(UIScrollBar scrollbar) {
         this.scrollbar = scrollbar;
+        return this;
+    }
+
+    public boolean getMultiselect() {
+        return this.multiselect;
+    }
+
+    public UISimpleList setMultiselect(boolean multiselect) {
+        this.multiselect = multiselect;
         return this;
     }
 
@@ -93,49 +109,45 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
             }
         }
 
-        this.onContentUpdate();
-        return this;
-    }
-
-    public UISimpleList selectElement(UISimpleListElement element) {
-        if (this.elements.contains(element)) {
-            element.setSelected(true);
-        }
-        return this;
-    }
-
-    public UISimpleList deselectElement(UISimpleListElement element) {
-        if (this.elements.contains(element)) {
-            element.setSelected(false);
-        }
-        return this;
-    }
-
-    public UISimpleList onContentUpdate() {
-        this.calculateContentSize();
         fireEvent(new ContentUpdateEvent<>(this));
         return this;
     }
 
-    public UISimpleList calculateContentSize() {
-        int contentWidth = 0;
-        int contentHeight = 0;
+    public UISimpleList selectElements(UISimpleListElement... elements) {
+        return this.setElementsSelection(true, elements);
+    }
 
-        for (UISimpleListElement element : this.elements)
-        {
-            contentWidth = Math.max(contentWidth, element.parentX() + element.getWidth() + this.xOffset);
-            contentHeight = Math.max(contentHeight, element.parentY() + element.getHeight() + this.yOffset);
+    public UISimpleList deselectElements(UISimpleListElement... elements) {
+        return this.setElementsSelection(false, elements);
+    }
+
+    private UISimpleList setElementsSelection(boolean select, UISimpleListElement... elements) {
+        if (!this.multiselect) {
+            Arrays.stream(elements).findFirst().ifPresent(e -> {
+                if (this.elements.contains(e)) {
+                    e.setSelected(select);
+                }
+            });
+        } else {
+            Arrays.stream(elements).forEach(e -> {
+                if (this.elements.contains(e)) {
+                    e.setSelected(select);
+                }
+            });
         }
-
-        this.contentHeight = contentHeight + getBottomPadding();
-        this.contentWidth = contentWidth + getRightPadding();
 
         return this;
     }
 
     @Override
-    public int getContentWidth()
-    {
+    public UISimpleList setSize(int width, int height) {
+        super.setSize(width, height);
+        this.scrollbar.updateScrollbar();
+        return this;
+    }
+
+    @Override
+    public int getContentWidth() {
         if (this.scrollbar != null && this.scrollbar.isVisible()) {
             return getWidth() - this.scrollbar.getWidth() - 2 - (getLeftPadding() + getRightPadding());
         }
@@ -144,31 +156,21 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
     }
 
     @Override
-    public int getContentHeight()
-    {
+    public int getContentHeight() {
         if (elements == null || elements.size() == 0) {
             return 0;
         }
 
         int height = 0;
         for (UISimpleListElement element : this.elements) {
-            height += element.getElementHeight() + this.elementSpacing;
+            height += element.getHeight() + this.elementSpacing;
         }
 
         return height - this.getTopPadding() - this.getBottomPadding();
     }
 
     @Override
-    public float getOffsetX() {
-        if (this.getContentWidth() < getWidth()) {
-            return 0;
-        }
-        return (float) this.xOffset / (this.getContentWidth() - getWidth());
-    }
-
-    @Override
-    public UIComponent<?> getComponentAt(int x, int y)
-    {
+    public UIComponent<?> getComponentAt(int x, int y) {
         final UIComponent<?> superComp = super.getComponentAt(x, y);
         if (superComp != null && superComp != this) {
             return superComp;
@@ -198,13 +200,18 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
     }
 
     @Override
+    public final float getOffsetX() {
+        return 0f;
+    }
+
+    @Override
     public void setOffsetX(float offsetX, int delta) {
         this.xOffset = Math.round((this.getContentWidth() - getWidth() + delta) * offsetX);
     }
 
     @Override
     public float getOffsetY() {
-        if (this.getContentHeight() < getHeight()) {
+        if (this.getContentHeight() <= getHeight()) {
             return 0;
         }
         return (float) this.yOffset / (this.getContentHeight() - getHeight());
@@ -302,7 +309,7 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
         }
 
         final int originalY = y;
-        y -= yOffset;
+        y -= this.yOffset;
         for (UISimpleListElement element : this.elements)
         {
             element.drawBackground(renderer, mouseX, mouseY, partialTick);
@@ -314,17 +321,17 @@ public class UISimpleList extends UIComponent<UISimpleList> implements IScrollab
     }
 
     @Override
-    public ClipArea getClipArea() {
+    public final ClipArea getClipArea() {
         return new ClipArea(this);
     }
 
     @Override
-    public void setClipContent(boolean clip) {
+    public final void setClipContent(boolean clip) {
         throw new UnsupportedOperationException("This component does not support this modification.");
     }
 
     @Override
-    public boolean shouldClipContent() {
+    public final boolean shouldClipContent() {
         return true;
     }
 }

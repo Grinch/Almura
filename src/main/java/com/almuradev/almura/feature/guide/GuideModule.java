@@ -30,7 +30,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
 
 public final class GuideModule extends AbstractModule implements CommonBinder {
 

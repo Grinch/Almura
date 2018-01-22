@@ -215,9 +215,9 @@ public class SimpleAboutMenu extends SimpleContainerScreen {
 
                 setSize(width, getHeight());
 
-//                if (this == parent.getSelected()) {
-//                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
-//                }
+                if (isSelected()) {
+                    super.drawBackground(renderer, mouseX, mouseY, partialTick);
+                }
             }
         }
     }
