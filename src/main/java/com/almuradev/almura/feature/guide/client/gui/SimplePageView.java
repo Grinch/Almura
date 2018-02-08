@@ -203,34 +203,28 @@ public class SimplePageView extends SimpleScreen {
         }
     }
 
-    public void refreshPageEntries() {
-        final PageListEntry oldEntry = this.pagesSelect.getSelectedValue();
-
+    public void refreshPageEntries(String targetId) {
         this.pagesSelect.setOptions(manager.getPageEntries());
 
-        if (oldEntry == null) {
-            this.pagesSelect.selectFirst();
-            this.refreshPage();
+        this.refreshPage(targetId);
+    }
 
-            return;
-        }
-
-        final PageListEntry newEntry = manager.getPageEntries()
-                .stream()
-                .filter(p -> p.getId().equalsIgnoreCase(oldEntry.getId()))
-                .findFirst().orElse(null);
-        if (newEntry != null) {
-            this.pagesSelect.select(newEntry);
+    public void refreshPage(String targetId) {
+        if (!targetId.isEmpty()) {
+            manager.getPageEntries().stream()
+                    .filter(p -> p.getId().equalsIgnoreCase(targetId))
+                    .findFirst()
+                    .ifPresent(p -> this.pagesSelect.select(p));
         } else {
             this.pagesSelect.selectFirst();
         }
 
-        this.refreshPage();
+        this.updateContent();
+        this.updateButtons();
     }
 
-    public void refreshPage() {
+    public void updateContent() {
         this.contentField.setText(manager.getPage() == null ? "" : manager.getPage().getContent());
-        this.updateButtons();
     }
 
     private boolean hasAnyPermission() {

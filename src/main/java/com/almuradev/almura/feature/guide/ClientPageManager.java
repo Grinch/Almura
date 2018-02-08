@@ -70,7 +70,6 @@ public final class ClientPageManager implements Witness {
         this.pageEntries.clear();
         this.pageEntries.addAll(pageEntries);
 
-
         if (!this.pageEntries.isEmpty()) {
             if (oldPage != null) {
                 this.pageEntries

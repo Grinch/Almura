@@ -35,7 +35,7 @@ public final class ClientboundPageOpenResponsePacketHandler implements MessageHa
 
         final GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
         if (currentScreen != null && currentScreen instanceof SimplePageView) {
-            ((SimplePageView) currentScreen).refreshPage();
+            ((SimplePageView) currentScreen).updateContent();
         }
     }
 }

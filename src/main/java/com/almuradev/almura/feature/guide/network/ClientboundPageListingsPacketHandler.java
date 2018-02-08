@@ -35,7 +35,7 @@ public final class ClientboundPageListingsPacketHandler implements MessageHandle
 
         final GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
         if (currentScreen != null && currentScreen instanceof SimplePageView) {
-            ((SimplePageView) currentScreen).refreshPageEntries();
+            ((SimplePageView) currentScreen).refreshPageEntries(manager.getPage() != null ? manager.getPage().getId() : "");
         }
     }
 }

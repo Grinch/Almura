@@ -44,7 +44,7 @@ public final class ClientboundPageChangeResponsePacketHandler implements Message
             } else {
                 final GuiScreen currentScreen = Minecraft.getMinecraft().currentScreen;
                 if (currentScreen != null && currentScreen instanceof SimplePageView) {
-                    ((SimplePageView) currentScreen).refreshPage();
+                    ((SimplePageView) currentScreen).refreshPage(message.id);
                 }
 
                 UIMessageBox.showDialog(Minecraft.getMinecraft().currentScreen, I18n.format("almura.guide.dialog.success.title"), I18n.format(message.message), MessageBoxButtons.OK);

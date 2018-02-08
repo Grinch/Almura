@@ -101,7 +101,6 @@ public final class ServerPageManager extends Witness.Impl implements Witness.Lif
                 final ConfigurationNode rootNode = loader.load();
                 final int index = rootNode.getNode(GuideConfig.INDEX).getInt(0);
                 final String name = rootNode.getNode(GuideConfig.NAME).getString(id);
-                final String title = rootNode.getNode(GuideConfig.TITLE).getString("");
 
                 final ConfigurationNode lastModifiedNode = rootNode.getNode(GuideConfig.LastModified.LAST_MODIFIED);
                 final String lastModifiedModifierRaw = lastModifiedNode.getNode(GuideConfig.LastModified.MODIFIER).getString("");
